@@ -1,113 +1,980 @@
-import Image from "next/image";
+'use client'
+import MaxWidthWrapper from '@/components/MaxWidthWrapper'
+import { buttonVariants } from '@/components/ui/button'
+import { ArrowRightIcon } from '@radix-ui/react-icons'
+import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+	// const [course, setCourse] = useState('basic algebra')
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+	//   const openai = new OpenAI({
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+	//
+	//     dangerouslyAllowBrowser: true
+	//   })
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+	//   async function main() {
+	//     let chat = await openai.chat.completions.create({
+	//       model: 'gpt-4',
+	//       messages: [
+	//         {
+	//             role: "system",
+	//             content: "You're a teaching assistant and your job is to help users generate courses, course outlines classified in modules and quizzes depending on the user request"
+	//         },
+	//         {
+	//             role: "user",
+	//             content: `Create a course outline for ${course}. The course outline should be classified into modules and each module should contain a title and description.`
+	//         }
+	//       ],
+	//       functions: [
+	//         {
+	//             name: "createCourseOutline",
+	//             description: 'Create a course outline for the user',
+	//             parameters: {
+	//                 type: "object",
+	//                 properties: {
+	//                     modules: {
+	//                         type: "array",
+	//                         description: 'An array of modules in the course outline consisting of objects that have a title and a description for that module',
+	//                         items: {
+	//                           type: 'object',
+	//                           properties: {
+	//                             title: {
+	//                               type: 'string'
+	//                             },
+	//                             description: {
+	//                               type: 'string'
+	//                             }
+	//                           }
+	//                         }
+	//                     }
+	//                 },
+	//                 required: ["modules"]
+	//             }
+	//         }
+	//       ],
+	//       function_call: { name: "createCourseOutline" }
+	//     })
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+	//     console.log(chat)
+	//   }
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+	//   main()
+
+	const icon = {
+		hidden: {
+			pathLength: 0,
+			// fill: "rgba(255, 255, 255, 1)"
+		},
+		visible: {
+			pathLength: 1,
+			// fill: "rgba(255, 255, 255, 0) "
+		},
+	}
+	//mb-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center
+
+	return (
+		<>
+			<MaxWidthWrapper className='mb-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center relative z-10'>
+				{/* <div className="[perspective:700px]">
+              <div className="relative [transform:rotateX(45deg)] ">
+                <div className="flex justify-between absolute w-full">
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                  <svg className="relative" width="2" height="624" viewBox="0 0 2 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M1 0V623.5" 
+                      // stroke="red"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                      style={{
+                        strokeDasharray: '10 1000',
+                        strokeDashoffset: '3',
+                        // strokeLinecap: 'round',
+                      }}
+                    />
+                  </svg>
+                </div>
+                <div className="flex flex-col justify-between absolute w-full h-[623px]">
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                  <svg className="relative" width="auto" height="2" viewBox="0 0 1234 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      stroke="black"
+                      className='absolute stroke-blue-100'
+                    />
+                    <motion.path 
+                      d="M0.5 1H1234"
+                      className='absolute stroke-blue-900 blur-[0.5px]'
+                        style={{
+                          strokeDasharray: '10 1500',
+                          strokeDashoffset: '3',
+                          // strokeLinecap: 'round',
+                        }}
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div> */}
+				{/* <div className=" mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 px-7 py-2 shadow-md backdrop-blur transition-all">
+  //bg-gradient-to-r from-[#3a015c] to-[#22007c] bg-clip-text text-transparent
+            </div> */}
+				<h1 className='max-w-5xl text-5xl font-bold md:text-6xl lg:text-7xl text-white tracking-tighter leading-[1]'>
+					Generate personalized <span className=' text-[#f5cbb6]'>courses</span>{' '}
+					for anything in seconds.
+				</h1>
+				<p className=' mt-5 max-w-xl sm:text-2xl text-gray-300'>
+					Ilimi lets you generate courses, quizzes and a learning pathway for
+					any concept you want to learn. Personalize your learning now!
+				</p>
+				<Link
+					href='/dashboard'
+					target='_blank'
+					className={buttonVariants({
+						size: 'hero',
+						variant: 'hero',
+						className: 'mt-5 bg-white text-black text-base hover:bg-gray-200',
+					})}
+				>
+					Sign up for free <ArrowRightIcon className='ml-2 h-4 w-4' />
+				</Link>
+			</MaxWidthWrapper>
+
+			<div>
+				<div className=' relative isolate'>
+					<div
+						aria-hidden='true'
+						className=' pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80'
+					>
+						<div
+							style={{
+								clipPath:
+									'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+							}}
+							className=' relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#3a015c] via-[#6a040f] to-[#0d00a4] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]'
+						/>
+					</div>
+
+					{/* <div aria-hidden='true' className=" pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+              <div style={{
+                clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)'
+              }} className=" relative left-[calc(50%-13rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#3a015c] via-[#6a040f] to-[#0d00a4] opacity-30 sm:left-[calc(50%-36rem)] sm:w-[72.1875rem]" />
+            </div> */}
+				</div>
+			</div>
+
+			{/* INFINITE GRID ANIMATION */}
+			{/* <div className="absolute top-0 w-screen h-screen [perspective:1000px] overflow-hidden [transform-style:preserve-3d] mb-[-100vh] [transform:rotateX(180deg)_rotateY(0)_rotate(0)_rotate(180deg)]">
+          <div className=" relative overflow-hidden w-screen h-[200vh] [transform-style:preserve-3d] [transform:translateY(-50vh)_rotateX(69deg)_rotateY(0)_rotate(0)]">
+            <div style={{
+              backgroundImage: 'radial-gradient(circle farthest-corner at 50% 50%, rgba(0, 0, 0, 0), #000 50%, #000)'
+            }} 
+            className=" absolute z-10 w-full h-[200vh] [transform-style:preserve-3d] [transform:translateZ(2000px)]"/>
+            <div className="flex absolute top-0 z-0 w-full h-[200vh] justify-around">
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              <div className="w-[1px] h-full bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+            </div>
+            <div className="z-0 w-full h-[400vh] absolute top-0 animate-grid-move">
+              <div className=" h-screen flex flex-col justify-between">
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              </div>
+              <div className=" h-screen flex flex-col justify-between">
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              </div>
+              <div className=" h-screen flex flex-col justify-between">
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              </div>
+              <div className=" h-screen flex flex-col justify-between">
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+                <div className=" w-full h-[1px] bg-[#370617] shadow-[0px_0px_10px_#dfe3e8]" />
+              </div>
+            </div>
+          </div>
+        </div> */}
+		</>
+	)
 }
+
+// messages: [
+//   {
+//       role: "user",
+//       content: "Create a new Cat object."
+//   }
+// ],
+// functions: [
+//   {
+//       name: "createCatObject",
+//       parameters: {
+//         type: 'object',
+//           properties: {
+//               name: {
+//                   type: "string"
+//               },
+//               colours: {
+//                   type: 'array',
+//                   description: "An array of 3 possible colours for a cat, e.g. ['Black', 'Brown', 'Grey'].",
+//                   items: {
+//                     type: 'string'
+//                   }
+//                   // enum: ["brown", "grey", "black"]
+//               },
+//               age: {
+//                   type: "integer"
+//               }
+//           },
+//           required: ["name", "colours", "age"]
+//       }
+//   }
+// ],
+// function_call: { name: "createCatObject" }
+
+// {
+//   "modules": [
+//     {
+//       "title": "Module 1: Introduction to Algebra",
+//       "description": "This module will cover the basic definitions and concepts needed to understand algebra. Topics covered include variables, constants, coefficients, expressions, and equations."
+//     },
+//     {
+//       "title": "Module 2: Operations on Algebraic Expressions",
+//       "description": "We will delve into the techniques of addition, subtraction, multiplication, and division on algebraic expressions. We will also learn about powers and roots."
+//     },
+//     {
+//       "title": "Module 3: Solving Simple Equations",
+//       "description": "This module will focus on teaching students how to solve simple algebraic equations using the concepts learned from the previous modules."
+//     },
+//     {
+//       "title": "Module 4: Solving Complex Equations",
+//       "description": "Building on the previous module, this section will teach strategies for solving more complex equations, including those with multiple variables."
+//     },
+//     {
+//       "title": "Module 5: Algebra in Geometry",
+//       "description": "In this module, students will learn how algebra is used in geometry, including finding angles, areas, and volumes."
+//     },
+//     {
+//       "title": "Module 6: Review and Final Exam",
+//       "description": "This last module will provide a comprehensive review of the course materials, and includes the final exam."
+//     }
+//   ]
+// }
