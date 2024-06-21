@@ -4,6 +4,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { ArrowRightIcon } from '@radix-ui/react-icons'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Navbar from '@/components/Navbar'
 
 export default function Home() {
 	// const [course, setCourse] = useState('basic algebra')
@@ -76,6 +77,7 @@ export default function Home() {
 
 	return (
 		<>
+			<Navbar />
 			<MaxWidthWrapper className='mb-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center relative z-10'>
 				{/* <div className="[perspective:700px]">
               <div className="relative [transform:rotateX(45deg)] ">

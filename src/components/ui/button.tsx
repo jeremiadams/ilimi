@@ -27,6 +27,7 @@ const buttonVariants = cva(
 				icon: 'h-10 w-10',
 				hero: 'h-11 rounded-full px-5',
 				nav: 'h-9 rounded-full px-4',
+				dashboard: 'bg-[#FAFAFA] text-black text-base hover:bg-gray-200',
 			},
 		},
 		defaultVariants: {

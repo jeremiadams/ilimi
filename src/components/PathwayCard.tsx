@@ -1,0 +1,36 @@
+import Link from 'next/link'
+import { FC } from 'react'
+
+interface PathwayCardProps {
+	size: 'big' | 'small'
+}
+
+const PathwayCard: FC<PathwayCardProps> = ({ size }) => {
+	return (
+		<Link
+			href='#'
+			className={`flex flex-col gap-20 py-6 px-8 transition-all justify-between bg-[#09090b] border border-[#27272A] hover:bg-[#000] duration-500 rounded-lg ${
+				size === 'big' ? 'max-w-[800px]' : 'w-full'
+			}`}
+		>
+			<div className='flex flex-col gap-4'>
+				<h3 className=' font-semibold text-2xl'>
+					Learn <span>Basic Algebra</span>
+				</h3>
+				<p className=' line-clamp-3'>
+					Improve your web development skills in a variety of languages and
+					frameworks, including HTML, CSS, JavaScript, React, TypeScript, and
+					cutting-edge methods in AI.
+				</p>
+			</div>
+			<div className='flex flex-col'>
+				<span className=''>Continue learning:</span>
+				<span className='text-[#7058d0] underline underline-offset-2'>
+					Module 3: Deal with it.
+				</span>
+			</div>
+		</Link>
+	)
+}
+
+export default PathwayCard
