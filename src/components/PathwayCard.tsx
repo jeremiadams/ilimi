@@ -9,7 +9,7 @@ const PathwayCard: FC<PathwayCardProps> = ({ size }) => {
 	return (
 		<Link
 			href='#'
-			className={`flex flex-col gap-20 py-6 px-8 transition-all justify-between bg-[#09090b] border border-[#27272A] hover:bg-[#000] duration-500 rounded-lg ${
+			className={`flex flex-col gap-20 py-5 sm:py-6 px-5 sm:px-8 transition-all justify-between bg-[#09090b] border border-[#27272A] hover:bg-[#000] duration-500 rounded-lg ${
 				size === 'big' ? 'max-w-[800px]' : 'w-full'
 			}`}
 		>

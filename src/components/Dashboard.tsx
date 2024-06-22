@@ -15,6 +15,8 @@ import {
 } from './ui/dialog'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
+import { Badge } from './ui/badge'
+import PathwayCard from './PathwayCard'
 
 interface DashboardProps {}
 
@@ -22,8 +24,8 @@ const Dashboard: FC<DashboardProps> = ({}) => {
 	return (
 		<DashboardLayout>
 			<div>
-				<div className='flex justify-between items-center mb-5'>
-					<h1 className=' font-medium text-lg'>Overview</h1>
+				<div className='flex flex-col sm:flex-row justify-start gap-4 sm:gap-0 sm:justify-between sm:items-center mb-5'>
+					<h1 className=' font-medium text-xl sm:text-lg'>Overview</h1>
 					<Dialog>
 						<DialogTrigger asChild>
 							<button
@@ -83,49 +85,9 @@ const Dashboard: FC<DashboardProps> = ({}) => {
 						</DialogContent>
 					</Dialog>
 				</div>
-				<div className='flex gap-5'>
-					<Link
-						href='#'
-						className='flex flex-col gap-20 py-6 px-8 transition-all justify-between max-w-[800px] bg-[#09090b] border border-[#27272A] hover:bg-[#000] duration-500 rounded-lg'
-					>
-						<div className='flex flex-col gap-4'>
-							<h3 className=' font-semibold text-2xl'>
-								Learn <span>Basic Algebra</span>
-							</h3>
-							<p className=' line-clamp-3'>
-								Improve your web development skills in a variety of languages
-								and frameworks, including HTML, CSS, JavaScript, React,
-								TypeScript, and cutting-edge methods in AI.
-							</p>
-						</div>
-						<div className='flex flex-col'>
-							<span className=''>Continue learning:</span>
-							<span className='text-[#7058d0] underline underline-offset-2'>
-								Module 3: Deal with it.
-							</span>
-						</div>
-					</Link>
-					<Link
-						href='#'
-						className='flex flex-col gap-20 py-6 px-8 transition-all justify-between max-w-[800px] bg-[#09090b] border border-[#27272A] hover:bg-[#000] duration-500 rounded-lg'
-					>
-						<div className='flex flex-col gap-4'>
-							<h3 className=' font-semibold text-2xl'>
-								Learn <span>Basic Algebra</span>
-							</h3>
-							<p className=' line-clamp-3'>
-								Improve your web development skills in a variety of languages
-								and frameworks, including HTML, CSS, JavaScript, React,
-								TypeScript, and cutting-edge methods in AI.
-							</p>
-						</div>
-						<div className='flex flex-col'>
-							<span className=''>Continue learning:</span>
-							<span className='text-[#7058d0] underline underline-offset-2'>
-								Module 3: Deal with it.
-							</span>
-						</div>
-					</Link>
+				<div className='flex gap-5 flex-wrap lg:flex-nowrap'>
+					<PathwayCard size='big' />
+					<PathwayCard size='big' />
 				</div>
 			</div>
 		</DashboardLayout>
