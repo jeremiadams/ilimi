@@ -13,7 +13,7 @@ const buttonVariants = cva(
 				destructive:
 					'bg-destructive text-destructive-foreground hover:bg-destructive/90',
 				outline:
-					'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+					'border border-[#FAFAFA] bg-background hover:bg-[#FAFAFA] hover:text-accent-foreground',
 				secondary:
 					'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				ghost: 'hover:bg-accent hover:text-accent-foreground',
@@ -28,6 +28,7 @@ const buttonVariants = cva(
 				hero: 'h-11 rounded-full px-5',
 				nav: 'h-9 rounded-full px-4',
 				dashboard: 'bg-[#FAFAFA] text-black text-base hover:bg-gray-200',
+				quiz: 'px-4 py-2',
 			},
 		},
 		defaultVariants: {

@@ -1,3 +1,5 @@
+'use client'
+
 import { Children, FC, PropsWithChildren } from 'react'
 import {
 	Tooltip,
@@ -18,8 +20,10 @@ import {
 } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { Button } from './ui/button'
+import { usePathname } from 'next/navigation'
 
 const DashboardLayout = ({ children }: PropsWithChildren) => {
+	const pathname = usePathname()
 	return (
 		<TooltipProvider>
 			<div className='flex flex-col sm:flex-row min-h-screen w-full text-[#FAFAFA] bg-[#09090b]'>
@@ -38,7 +42,11 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
 								<TooltipTrigger asChild>
 									<Link
 										href='/dashboard'
-										className='flex justify-center md:justify-normal bg-[#262628] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2 md:text-base'
+										className={`flex justify-center md:justify-normal ${
+											pathname === '/dashboard'
+												? 'bg-[#262628]'
+												: 'text-[#A1A1AA]'
+										} shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2 md:text-base`}
 									>
 										<HomeIcon className='h-[18px] w-[18px]' />
 										<span className='hidden md:block'>Overview</span>
@@ -55,7 +63,11 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
 								<TooltipTrigger asChild>
 									<Link
 										href='/dashboard/pathways'
-										className='flex justify-center md:justify-normal text-[#A1A1AA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2 md:text-base'
+										className={`flex justify-center md:justify-normal ${
+											pathname.includes('pathways')
+												? 'bg-[#262628]'
+												: 'text-[#A1A1AA]'
+										} shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2 md:text-base`}
 									>
 										<Route className='h-[18px] w-[18px]' />
 										<span className='hidden md:block'>Pathways</span>
@@ -67,8 +79,11 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
 								<TooltipTrigger asChild>
 									<Link
 										href='/dashboard/settings'
-										className='flex justify-center md:justify-normal text-[#A1A1AA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2
-										md:text-base'
+										className={`flex justify-center md:justify-normal ${
+											pathname.includes('settings')
+												? 'bg-[#262628]'
+												: 'text-[#A1A1AA]'
+										} shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2 md:text-base`}
 									>
 										<Settings className='h-[18px] w-[18px]' />
 										<span className='hidden md:block'>Settings</span>
@@ -106,7 +121,7 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
 								<TooltipTrigger asChild>
 									<Link
 										href='#'
-										className='flex justify-center md:justify-normal text-[#A1A1AA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2
+										className='flex justify-center md:justify-normal text-[#A1A1AA] hover:text-[#FAFAFA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2
 										md:text-base'
 									>
 										<LogOut className='h-[18px] w-[18px]' />
@@ -147,21 +162,33 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
 										</div>
 										<Link
 											href='/dashboard'
-											className='flex text-[#FAFAFA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-4 text-xl'
+											className={`flex ${
+												pathname === '/dashboard'
+													? 'text-[#FAFAFA]'
+													: 'text-[#A1A1AA] '
+											} shrink-0 w-full py-2 px-3 rounded-sm items-center gap-4 text-xl`}
 										>
 											<HomeIcon className='h-5 w-5' />
 											<span className=''>Overview</span>
 										</Link>
 										<Link
 											href='/dashboard/pathways'
-											className='flex text-[#A1A1AA] hover:text-[#FAFAFA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-4 text-xl'
+											className={`flex ${
+												pathname.includes('pathways')
+													? 'text-[#FAFAFA]'
+													: 'text-[#A1A1AA] '
+											} shrink-0 w-full py-2 px-3 rounded-sm items-center gap-4 text-xl`}
 										>
 											<Route className='h-5 w-5' />
 											<span className=''>Pathways</span>
 										</Link>
 										<Link
 											href='/dashboard/settings'
-											className='flex text-[#A1A1AA] hover:text-[#FAFAFA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-4 text-xl'
+											className={`flex ${
+												pathname.includes('settings')
+													? 'text-[#FAFAFA]'
+													: 'text-[#A1A1AA] '
+											} shrink-0 w-full py-2 px-3 rounded-sm items-center gap-4 text-xl`}
 										>
 											<Settings className='h-5 w-5' />
 											<span className=''>Settings</span>
