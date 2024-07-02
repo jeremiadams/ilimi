@@ -1,5 +1,5 @@
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
-import { publicProcedure, router } from './trpc'
+import { privateProcedure, publicProcedure, router } from './trpc'
 import { TRPCError } from '@trpc/server'
 import { db } from '@/db'
 
@@ -28,6 +28,20 @@ export const appRouter = router({
 		}
 
 		return { success: true }
+	}),
+	getPathways: privateProcedure.query(async ({ ctx }) => {
+		const { userId, user } = ctx
+
+		return await db.pathway.findMany({
+			where: {
+				userId,
+			},
+			include: {
+				Module: true,
+				// title: true,
+				// description: true,
+			},
+		})
 	}),
 })
 export type AppRouter = typeof appRouter

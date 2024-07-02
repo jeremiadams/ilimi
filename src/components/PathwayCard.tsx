@@ -3,24 +3,34 @@ import { FC } from 'react'
 
 interface PathwayCardProps {
 	size: 'big' | 'small'
+	title: string
+	description: string
+	id: string
+	// status: 'NOT_STARTED' | 'PENDING' | 'SUCCESS'
 }
 
-const PathwayCard: FC<PathwayCardProps> = ({ size }) => {
+const PathwayCard: FC<PathwayCardProps> = ({
+	size,
+	title,
+	description,
+	id,
+}) => {
 	return (
 		<Link
-			href='#'
+			href={`/dashboard/pathways/${id}`}
 			className={`flex flex-col gap-20 py-5 sm:py-6 px-5 sm:px-8 transition-all justify-between bg-[#09090b] border border-[#27272A] hover:bg-[#000] duration-500 rounded-lg ${
 				size === 'big' ? 'max-w-[800px]' : 'w-full'
 			}`}
 		>
 			<div className='flex flex-col gap-4'>
 				<h3 className=' font-semibold text-2xl'>
-					Learn <span>Basic Algebra</span>
+					Learn <span>{title}</span>
 				</h3>
 				<p className=' line-clamp-3'>
-					Improve your web development skills in a variety of languages and
+					{/* Improve your web development skills in a variety of languages and
 					frameworks, including HTML, CSS, JavaScript, React, TypeScript, and
-					cutting-edge methods in AI.
+					cutting-edge methods in AI. */}
+					{description}
 				</p>
 			</div>
 			<div className='flex flex-col'>

@@ -208,7 +208,7 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
 						</Sheet>
 					</header>
 				</div>
-				<main className='max-[639px]:ml-0 min-[640px]:ml-20 md:ml-60 w-full p-5 sm:p-10 bg-[#151518]'>
+				<main className='max-[639px]:ml-0 min-[640px]:ml-20 md:ml-60 w-full h-[calc(100vh-4rem)] sm:h-auto p-5 sm:p-10 bg-[#151518]'>
 					{children}
 				</main>
 			</div>
