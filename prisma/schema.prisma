@@ -47,6 +47,7 @@ model Module {
   title       String?
   description String?
   content     String?
+  isComplete  Boolean  @default(false)
   Pathway     Pathway? @relation(fields: [pathwayId], references: [id])
   pathwayId   String?
 }

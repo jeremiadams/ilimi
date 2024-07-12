@@ -6,7 +6,7 @@ interface PathwayCardProps {
 	title: string
 	description: string
 	id: string
-	// status: 'NOT_STARTED' | 'PENDING' | 'SUCCESS'
+	status: 'NOT_STARTED' | 'PENDING' | 'COMPLETED'
 }
 
 const PathwayCard: FC<PathwayCardProps> = ({

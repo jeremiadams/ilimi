@@ -38,8 +38,6 @@ export const appRouter = router({
 			},
 			include: {
 				Module: true,
-				// title: true,
-				// description: true,
 			},
 		})
 	}),

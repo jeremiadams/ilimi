@@ -31,6 +31,7 @@ const Dashboard: FC<DashboardProps> = ({}) => {
 								key={pathway.id}
 								title={pathway.title}
 								description={pathway.description}
+								status={pathway.pathwayStatus}
 							/>
 							{/* <PathwayCard size='big' /> */}
 						</div>

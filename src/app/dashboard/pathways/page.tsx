@@ -13,7 +13,7 @@ const page: FC<pageProps> = async ({}) => {
 
 	if (!user || !user.id) redirect('/auth-callback?origin=dashboard/pathways')
 
-	return <OnePathway />
+	return <Pathways />
 }
 
 export default page
