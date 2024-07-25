@@ -5,63 +5,75 @@ import { ArrowRightIcon } from '@radix-ui/react-icons'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import { useState } from 'react'
+import { openai } from '@/lib/openai'
 
 export default function Home() {
 	// const [course, setCourse] = useState('basic algebra')
 
-	//   const openai = new OpenAI({
+	// const openai = new openai({
 
-	//
-	//     dangerouslyAllowBrowser: true
-	//   })
+	//   dangerouslyAllowBrowser: true
+	// })
 
-	//   async function main() {
-	//     let chat = await openai.chat.completions.create({
-	//       model: 'gpt-4',
-	//       messages: [
-	//         {
-	//             role: "system",
-	//             content: "You're a teaching assistant and your job is to help users generate courses, course outlines classified in modules and quizzes depending on the user request"
-	//         },
-	//         {
-	//             role: "user",
-	//             content: `Create a course outline for ${course}. The course outline should be classified into modules and each module should contain a title and description.`
-	//         }
-	//       ],
-	//       functions: [
-	//         {
-	//             name: "createCourseOutline",
-	//             description: 'Create a course outline for the user',
-	//             parameters: {
-	//                 type: "object",
-	//                 properties: {
-	//                     modules: {
-	//                         type: "array",
-	//                         description: 'An array of modules in the course outline consisting of objects that have a title and a description for that module',
-	//                         items: {
-	//                           type: 'object',
-	//                           properties: {
-	//                             title: {
-	//                               type: 'string'
-	//                             },
-	//                             description: {
-	//                               type: 'string'
-	//                             }
-	//                           }
-	//                         }
-	//                     }
-	//                 },
-	//                 required: ["modules"]
-	//             }
-	//         }
-	//       ],
-	//       function_call: { name: "createCourseOutline" }
-	//     })
+	// async function main() {
+	// 	let chat = await openai.chat.completions.create({
+	// 		model: 'gpt-4o-mini',
+	// 		messages: [
+	// 			{
+	// 				role: 'system',
+	// 				content:
+	// 					"You're a teaching assistant and your job is to help users generate courses, course outlines classified in modules and quizzes depending on the user request",
+	// 			},
+	// 			{
+	// 				role: 'user',
+	// 				content: `Create a course outline for ${course}. The course outline should be classified into modules and each module should contain a title and description.`,
+	// 			},
+	// 		],
+	// 		functions: [
+	// 			{
+	// 				name: 'createCourseOutline',
+	// 				description: 'Create a course outline for the user',
+	// 				parameters: {
+	// 					type: 'object',
+	// 					properties: {
+	// 						title: {
+	// 							type: 'string',
+	// 							description:
+	// 								'The title of the course the user wants to generate',
+	// 						},
+	// 						description: {
+	// 							type: 'string',
+	// 							description: 'An overview of what the course is about',
+	// 						},
+	// 						modules: {
+	// 							type: 'array',
+	// 							description:
+	// 								'An array of modules in the course outline consisting of objects that have a title and a description for that module',
+	// 							items: {
+	// 								type: 'object',
+	// 								properties: {
+	// 									title: {
+	// 										type: 'string',
+	// 									},
+	// 									description: {
+	// 										type: 'string',
+	// 									},
+	// 								},
+	// 							},
+	// 						},
+	// 					},
+	// 					required: ['modules'],
+	// 				},
+	// 			},
+	// 		],
+	// 		function_call: { name: 'createCourseOutline' },
+	// 	})
 
-	//     console.log(chat)
-	//   }
+	// 	console.log(typeof chat.choices[0].message.function_call?.arguments === 'string' ? JSON.parse(chat.choices[0].message.function_call?.arguments) :  'null')
+	// }
 
-	//   main()
+	// main()
 
 	const icon = {
 		hidden: {
@@ -980,3 +992,5 @@ export default function Home() {
 //     }
 //   ]
 // }
+
+//{"modules": [{"title":"Introduction to Algebra","description":"This module introduces the basic concepts of algebra, including variables, constants, and algebraic expressions. Students will learn how to identify and categorize different types of algebraic expressions."},{"title":"Operations with Algebraic Expressions","description":"In this module, students will explore the four basic operations (addition, subtraction, multiplication, and division) as they relate to algebraic expressions. Simplifying expressions and combining like terms will be emphasized."},{"title":"Solving Linear Equations","description":"Students will learn how to solve linear equations in one variable. The module covers the methods for isolating variables and techniques for solving equations with one or two steps."},{"title":"Graphing Linear Equations","description":"This module covers the basics of graphing linear equations on a coordinate plane. Students will learn about slope, intercepts, and how to plot points."},{"title":"Systems of Linear Equations","description":"Students will be introduced to systems of linear equations. The module will cover methods for solving systems, including substitution and elimination."},{"title":"Inequalities and Absolute Value","description":"In this module, students will explore linear inequalities and absolute value equations. They will learn to solve and graph inequalities on a number line."},{"title":"Polynomials","description":"This module focuses on polynomials, including the classification, addition, subtraction, and multiplication of polynomials. Students will also learn how to factor simple polynomials."},{"title":"Introduction to Quadratic Equations","description":"Students will be introduced to quadratic equations, exploring their general form and methods for solving them, including factoring, completing the square, and the quadratic formula."},{"title":"Conclusion and Review","description":"This final module will review all concepts covered throughout the course, and provide students with strategies for continued practice and application of algebra in real-world scenarios."}]}

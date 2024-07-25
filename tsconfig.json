@@ -26,7 +26,8 @@
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",
-		"src/app/dashboard/pathways/[slug]"
+		"src/app/dashboard/pathways/[slug]",
+		"src/app/dashboard/pathways/modules"
 	],
 	"exclude": ["node_modules"]
 }
