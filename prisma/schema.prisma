@@ -40,8 +40,8 @@ model Pathway {
 
   createdAt DateTime @default(now())
 
-  Module   Module[]
-  messages Message[]
+  Module  Module[]
+  Message Message[]
 
   User   User?   @relation(fields: [userId], references: [id])
   userId String?

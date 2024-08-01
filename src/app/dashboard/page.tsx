@@ -18,6 +18,35 @@ const Page: FC<PageProps> = async ({}) => {
 		},
 	})
 
+	// const pathway = await db.pathway.create({
+	// 	data: {
+	// 		title: 'testing',
+	// 		description: 'testing it',
+	// 		userId: 'kp_c56cab8c0e194792b671724ad34e62e8',
+	// 		Module: {
+	// 			createMany: {
+	// 				data: [
+	// 					{ title: 'yo', description: 'yoyo' },
+	// 					{ title: 'mo', description: 'momo' },
+	// 				],
+	// 			},
+	// 		},
+	// 	},
+	// })
+
+	// console.log(message)
+
+	// const message = await db.message.create({
+	// 	data: {
+	// 		text: 'testing mess',
+	// 		isUserMessage: false,
+	// 		pathwayId: 'clz2pll4g001lgdkz36oui6p0',
+	// 		userId: 'kp_c56cab8c0e194792b671724ad34e62e8',
+	// 	},
+	// })
+
+	// console.log(message)
+
 	if (!dbUser) redirect('/auth-callback?origin=dashboard')
 
 	return <Dashboard />

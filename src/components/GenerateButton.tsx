@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useState } from 'react'
+import { FC, useContext, useState } from 'react'
 import {
 	Dialog,
 	DialogClose,
@@ -15,15 +15,21 @@ import { Button, buttonVariants } from './ui/button'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { PlusIcon } from '@radix-ui/react-icons'
+import { AppContext } from '@/context/AppContext'
+import { Loader2 } from 'lucide-react'
 
 interface GenerateButtonProps {}
 
 const GenerateButton: FC<GenerateButtonProps> = ({}) => {
+	const { createPathway, handleInputChange, isLoading, message, setMessage } =
+		useContext(AppContext)
+
 	const [isOpen, setIsOpen] = useState<boolean>(false)
+	// const [lockModal, setLockModal] = useState<boolean>(true)
 
 	return (
 		<Dialog
-			open={isOpen}
+			open={isLoading ? isLoading : isOpen}
 			onOpenChange={(v) => {
 				if (!v) {
 					setIsOpen(v)
@@ -59,18 +65,33 @@ const GenerateButton: FC<GenerateButtonProps> = ({}) => {
 						</Label>
 						<Input
 							id='generate'
+							onChange={handleInputChange}
+							value={message}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									e.preventDefault()
+
+									createPathway()
+									setMessage('')
+								}
+							}}
 							className='border-[#27272A] focus:border-[#FAFAFA]'
 						/>
 					</div>
 					<button
 						type='submit'
+						disabled={isLoading}
 						className={buttonVariants({
 							size: 'dashboard',
 							variant: 'hero',
 							className: ' h-10 rounded-md px-5',
 						})}
+						onClick={() => {
+							createPathway()
+							setMessage('')
+						}}
 					>
-						Generate
+						{isLoading ? <Loader2 className=' animate-spin' /> : 'Generate'}
 					</button>
 				</div>
 				<DialogFooter className='sm:justify-start'>

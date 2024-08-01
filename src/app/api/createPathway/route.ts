@@ -2,7 +2,7 @@ import { db } from '@/db'
 import { openai } from '@/lib/openai'
 import { SendMessageValidator } from '@/lib/validators/SendMessageValidator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (req: NextRequest) => {
 	const body = await req.json()
@@ -16,14 +16,8 @@ export const POST = async (req: NextRequest) => {
 
 	const { message } = SendMessageValidator.parse(body)
 
-	// await db.message.create({
-	//     data: {
-	//         text: message,
-	//         isUserMessage: true,
-	//         userId: user.id
-	//     },
+	// return NextResponse.json({ message }, { status: 200 })
 
-	// })
 	let response = await openai.chat.completions.create({
 		model: 'gpt-4o-mini',
 		messages: [
@@ -44,6 +38,14 @@ export const POST = async (req: NextRequest) => {
 				parameters: {
 					type: 'object',
 					properties: {
+						title: {
+							type: 'string',
+							description: 'The title of the course the user wants to generate',
+						},
+						description: {
+							type: 'string',
+							description: 'An overview of what the course is about',
+						},
 						modules: {
 							type: 'array',
 							description:
@@ -61,15 +63,19 @@ export const POST = async (req: NextRequest) => {
 							},
 						},
 					},
-					required: ['modules'],
+					required: ['title', 'description', 'modules'],
 				},
 			},
 		],
 		function_call: { name: 'createCourseOutline' },
 	})
 
+	// return NextResponse.json({ response }, { status: 200 })
+
 	if (
-		typeof response.choices[0].message.function_call?.arguments === 'string'
+		typeof response.choices[0].message.function_call?.arguments === 'string' &&
+		typeof JSON.parse(response.choices[0].message.function_call?.arguments) ===
+			'object'
 	) {
 		const pathwayObj = JSON.parse(
 			response.choices[0].message.function_call?.arguments
@@ -81,20 +87,29 @@ export const POST = async (req: NextRequest) => {
 				userId: user.id,
 				Module: {
 					createMany: {
-						data: pathwayObj.modules,
+						data: pathwayObj?.modules,
 					},
 				},
 			},
 		})
+
 		await db.message.create({
 			data: {
-				text: response.choices[0].message.function_call?.arguments,
+				text:
+					typeof response.choices[0].message.function_call?.arguments ===
+					'string'
+						? response.choices[0].message.function_call?.arguments
+						: JSON.stringify(
+								response.choices[0].message.function_call?.arguments
+						  ),
 				isUserMessage: false,
-				pathwayId: pathway.id,
+				pathwayId: pathway?.id,
 				userId: user.id,
 			},
 		})
+
+		return NextResponse.json({ pathway }, { status: 200 })
 	} else {
-		return new Response('Generate Error', { status: 400 })
+		return new Response('Cannot generate pathway', { status: 400 })
 	}
 }

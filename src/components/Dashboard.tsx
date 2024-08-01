@@ -8,12 +8,34 @@ import { trpc } from '@/app/_trpc/client'
 import Loading from './Loading'
 import { Ghost } from 'lucide-react'
 import { Skeleton } from './ui/skeleton'
+import { db } from '@/db'
 
 interface DashboardProps {}
 
 const Dashboard: FC<DashboardProps> = ({}) => {
 	const { data: pathways, isLoading } = trpc.getPathways.useQuery()
 	console.log(pathways)
+
+	// const main = async () => {
+	// 	const pathway = await db.pathway.create({
+	// 		data: {
+	// 			title: 'testing',
+	// 			description: 'testing it',
+	// 			userId: 'kp_c56cab8c0e194792b671724ad34e62e8',
+	// 			Module: {
+	// 				createMany: {
+	// 					data: [
+	// 						{ title: 'yo', description: 'yoyo' },
+	// 						{ title: 'mo', description: 'momo' },
+	// 					],
+	// 				},
+	// 			},
+	// 		},
+	// 	})
+
+	// 	console.log(pathway)
+	// }
+	// main()
 
 	return (
 		<DashboardLayout>
@@ -23,8 +45,8 @@ const Dashboard: FC<DashboardProps> = ({}) => {
 					<GenerateButton />
 				</div>
 				{pathways && pathways.length > 0 ? (
-					pathways.map((pathway) => (
-						<div className='flex gap-5 flex-wrap lg:flex-nowrap'>
+					<div className='flex gap-5 flex-wrap lg:flex-nowrap'>
+						{pathways.map((pathway) => (
 							<PathwayCard
 								size='big'
 								id={pathway.id}
@@ -33,9 +55,8 @@ const Dashboard: FC<DashboardProps> = ({}) => {
 								description={pathway.description}
 								status={pathway.pathwayStatus}
 							/>
-							{/* <PathwayCard size='big' /> */}
-						</div>
-					))
+						))}
+					</div>
 				) : isLoading ? (
 					<div className='flex justify-center mt-28 '>
 						<div className='space-y-2'>

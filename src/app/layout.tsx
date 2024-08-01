@@ -4,6 +4,7 @@ import './globals.css'
 import { cn } from '@/lib/utils'
 import Navbar from '@/components/Navbar'
 import Providers from '@/components/Providers'
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({
 	weight: ['400', '500', '600', '700', '800', '900'],
@@ -34,6 +35,7 @@ export default function RootLayout({
 					)}
 				>
 					{children}
+					<Toaster />
 				</body>
 			</Providers>
 		</html>
