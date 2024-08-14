@@ -53,7 +53,7 @@ model Module {
   description String? @db.Text()
   content     String? @db.Text()
 
-  isComplete Boolean @default(false)
+  pathwayStatus PathwayStatus @default(NOT_STARTED)
 
   Pathway   Pathway? @relation(fields: [pathwayId], references: [id])
   pathwayId String?

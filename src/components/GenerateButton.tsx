@@ -73,6 +73,7 @@ const GenerateButton: FC<GenerateButtonProps> = ({}) => {
 
 									createPathway()
 									setMessage('')
+									setIsOpen(false)
 								}
 							}}
 							className='border-[#27272A] focus:border-[#FAFAFA]'

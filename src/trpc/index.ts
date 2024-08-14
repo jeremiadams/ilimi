@@ -2,6 +2,7 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { privateProcedure, publicProcedure, router } from './trpc'
 import { TRPCError } from '@trpc/server'
 import { db } from '@/db'
+import { z } from 'zod'
 
 export const appRouter = router({
 	authCallback: publicProcedure.query(async () => {
@@ -36,10 +37,44 @@ export const appRouter = router({
 			where: {
 				userId,
 			},
+			orderBy: [{ createdAt: 'desc' }],
 			include: {
 				Module: true,
 			},
 		})
 	}),
+	getRecentPathways: privateProcedure.query(async ({ ctx }) => {
+		const { userId, user } = ctx
+
+		return await db.pathway.findMany({
+			where: {
+				userId,
+			},
+			take: 2,
+			orderBy: [{ createdAt: 'desc' }],
+			include: {
+				Module: true,
+			},
+		})
+	}),
+	markAsStarted: privateProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			})
+		)
+		.mutation(async ({ ctx, input }) => {
+			const { userId, user } = ctx
+			const { id } = input
+
+			return await db.pathway.update({
+				where: {
+					id,
+				},
+				data: {
+					pathwayStatus: 'PENDING',
+				},
+			})
+		}),
 })
 export type AppRouter = typeof appRouter

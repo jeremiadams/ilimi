@@ -1,5 +1,7 @@
 import { FC } from 'react'
 import DashboardLayout from './DashboardLayout'
+import ReactMarkdown from 'react-markdown'
+import { cn } from '@/lib/utils'
 
 interface OneModuleProps {
 	title: string | null
@@ -22,7 +24,14 @@ const OneModule: FC<OneModuleProps> = ({ title, description, content }) => {
 				</div>
 			</div>
 			<div className='pt-10'>
-				<p>{content}</p>
+				{/* <p>{content}</p> */}
+				<ReactMarkdown
+					className={cn(
+						`prose prose-white prose-p:text-white prose-headings:text-white prose-ol:text-white prose-ul:text-white prose-strong:text-white prose-a:text-[#7058d0] prose-code:text-[#f5cbb6]`
+					)}
+				>
+					{content}
+				</ReactMarkdown>
 			</div>
 		</DashboardLayout>
 	)

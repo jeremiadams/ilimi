@@ -31,8 +31,13 @@ const Page: FC<PageProps> = async ({ params }) => {
 				select: {
 					id: true,
 					title: true,
-					isComplete: true,
+					pathwayStatus: true,
 				},
+				orderBy: [
+					{
+						id: 'asc',
+					},
+				],
 			},
 		},
 	})
@@ -43,6 +48,7 @@ const Page: FC<PageProps> = async ({ params }) => {
 
 	return (
 		<OnePathway
+			id={slug}
 			title={pathway.title}
 			description={pathway.description}
 			modules={pathway.Module}

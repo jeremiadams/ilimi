@@ -1,5 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import { FC } from 'react'
+import { Badge } from './ui/badge'
+import { trpc } from '@/app/_trpc/client'
 
 interface PathwayCardProps {
 	size: 'big' | 'small'
@@ -14,11 +18,21 @@ const PathwayCard: FC<PathwayCardProps> = ({
 	title,
 	description,
 	id,
+	status,
 }) => {
+	const { mutate } = trpc.markAsStarted.useMutation()
+
+	const handleMarkAsPending = () => {
+		mutate({ id })
+	}
+
 	return (
 		<Link
+			onClick={() => {
+				if (status === 'NOT_STARTED') handleMarkAsPending()
+			}}
 			href={`/dashboard/pathways/${id}`}
-			className={`flex flex-col gap-20 py-5 sm:py-6 px-5 sm:px-8 transition-all justify-between bg-[#09090b] border border-[#27272A] hover:bg-[#000] duration-500 rounded-lg ${
+			className={`flex flex-col gap-20 py-5 sm:py-6 px-5 sm:px-8 grow-0 transition-all justify-between bg-[#09090b] border border-[#27272A] hover:bg-[#000] duration-500 rounded-lg ${
 				size === 'big' ? 'max-w-[800px]' : 'w-full'
 			}`}
 		>
@@ -34,9 +48,17 @@ const PathwayCard: FC<PathwayCardProps> = ({
 				</p>
 			</div>
 			<div className='flex flex-col'>
-				<span className=''>Continue learning:</span>
+				{/* <span className=''>Continue learning:</span> */}
 				<span className='text-[#7058d0] underline underline-offset-2'>
-					Module 3: Deal with it.
+					{status === 'NOT_STARTED' ? (
+						'Start learning'
+					) : status === 'PENDING' ? (
+						'Continue learning:'
+					) : (
+						<Badge variant='completed' className='sm:ml-10 shrink-0'>
+							Completed
+						</Badge>
+					)}
 				</span>
 			</div>
 		</Link>

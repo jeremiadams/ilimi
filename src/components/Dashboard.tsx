@@ -13,29 +13,7 @@ import { db } from '@/db'
 interface DashboardProps {}
 
 const Dashboard: FC<DashboardProps> = ({}) => {
-	const { data: pathways, isLoading } = trpc.getPathways.useQuery()
-	console.log(pathways)
-
-	// const main = async () => {
-	// 	const pathway = await db.pathway.create({
-	// 		data: {
-	// 			title: 'testing',
-	// 			description: 'testing it',
-	// 			userId: 'kp_c56cab8c0e194792b671724ad34e62e8',
-	// 			Module: {
-	// 				createMany: {
-	// 					data: [
-	// 						{ title: 'yo', description: 'yoyo' },
-	// 						{ title: 'mo', description: 'momo' },
-	// 					],
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	console.log(pathway)
-	// }
-	// main()
+	const { data: pathways, isLoading } = trpc.getRecentPathways.useQuery()
 
 	return (
 		<DashboardLayout>

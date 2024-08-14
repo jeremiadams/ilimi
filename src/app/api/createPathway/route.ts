@@ -16,7 +16,7 @@ export const POST = async (req: NextRequest) => {
 
 	const { message } = SendMessageValidator.parse(body)
 
-	// return NextResponse.json({ message }, { status: 200 })
+	const firstUserMessage = `Create a course outline for ${message}. The course outline should be classified into modules and each module should contain a title and description.`
 
 	let response = await openai.chat.completions.create({
 		model: 'gpt-4o-mini',
@@ -24,11 +24,11 @@ export const POST = async (req: NextRequest) => {
 			{
 				role: 'system',
 				content:
-					"You're a teaching assistant and your job is to help users generate courses, course outlines classified in modules and quizzes depending on the user request",
+					"You're a teaching assistant and your job is to help users generate courses depending on the user request",
 			},
 			{
 				role: 'user',
-				content: `Create a course outline for ${message}. The course outline should be classified into modules and each module should contain a title and description.`,
+				content: firstUserMessage,
 			},
 		],
 		functions: [
@@ -55,6 +55,8 @@ export const POST = async (req: NextRequest) => {
 								properties: {
 									title: {
 										type: 'string',
+										description:
+											'The title of a module. Just the title text, ensure not to include what module number it is',
 									},
 									description: {
 										type: 'string',
@@ -69,8 +71,6 @@ export const POST = async (req: NextRequest) => {
 		],
 		function_call: { name: 'createCourseOutline' },
 	})
-
-	// return NextResponse.json({ response }, { status: 200 })
 
 	if (
 		typeof response.choices[0].message.function_call?.arguments === 'string' &&
@@ -93,19 +93,27 @@ export const POST = async (req: NextRequest) => {
 			},
 		})
 
-		await db.message.create({
-			data: {
-				text:
-					typeof response.choices[0].message.function_call?.arguments ===
-					'string'
-						? response.choices[0].message.function_call?.arguments
-						: JSON.stringify(
-								response.choices[0].message.function_call?.arguments
-						  ),
-				isUserMessage: false,
-				pathwayId: pathway?.id,
-				userId: user.id,
-			},
+		await db.message.createMany({
+			data: [
+				{
+					text: firstUserMessage,
+					isUserMessage: true,
+					pathwayId: pathway?.id,
+					userId: user.id,
+				},
+				{
+					text:
+						typeof response.choices[0].message.function_call?.arguments ===
+						'string'
+							? response.choices[0].message.function_call?.arguments
+							: JSON.stringify(
+									response.choices[0].message.function_call?.arguments
+							  ),
+					isUserMessage: false,
+					pathwayId: pathway?.id,
+					userId: user.id,
+				},
+			],
 		})
 
 		return NextResponse.json({ pathway }, { status: 200 })
