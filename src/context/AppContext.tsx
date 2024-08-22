@@ -50,7 +50,9 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 			})
 
 			if (!response.ok) {
-				throw new Error('Failed to send message')
+				throw new Error(
+					`Cannot generate learning pathway for ${message}. Kindly input something more intuitive or try again later.`
+				)
 			}
 
 			return response.body
@@ -65,9 +67,9 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 		onSettled: () => {
 			setIsLoading(false)
 		},
-		onError: () => {
+		onError: (error) => {
 			return toast({
-				title: 'There was an error generating pathway',
+				title: error.message,
 				description: 'Please try again',
 				variant: 'destructive',
 			})

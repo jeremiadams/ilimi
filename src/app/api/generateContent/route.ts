@@ -17,105 +17,6 @@ export const POST = async (req: NextRequest) => {
 	const { moduleId, pathwayId, moduleNumber, moduleTitle } =
 		GenerateContentValidator.parse(body)
 
-	// const firstUserMessage = `Create a course outline for ${message}. The course outline should be classified into modules and each module should contain a title and description.`
-
-	// let response = await openai.chat.completions.create({
-	// 	model: 'gpt-4o-mini',
-	// 	messages: [
-	// 		{
-	// 			role: 'system',
-	// 			content:
-	// 				"You're a teaching assistant and your job is to help users generate courses, course outlines classified in modules and quizzes depending on the user request",
-	// 		},
-	// 		{
-	// 			role: 'user',
-	// 			content: firstUserMessage,
-	// 		},
-	// 	],
-	// 	functions: [
-	// 		{
-	// 			name: 'createCourseOutline',
-	// 			description: 'Create a course outline for the user',
-	// 			parameters: {
-	// 				type: 'object',
-	// 				properties: {
-	// 					title: {
-	// 						type: 'string',
-	// 						description: 'The title of the course the user wants to generate',
-	// 					},
-	// 					description: {
-	// 						type: 'string',
-	// 						description: 'An overview of what the course is about',
-	// 					},
-	// 					modules: {
-	// 						type: 'array',
-	// 						description:
-	// 							'An array of modules in the course outline consisting of objects that have a title and a description for each module',
-	// 						items: {
-	// 							type: 'object',
-	// 							properties: {
-	// 								title: {
-	// 									type: 'string',
-	// 								},
-	// 								description: {
-	// 									type: 'string',
-	// 								},
-	// 							},
-	// 						},
-	// 					},
-	// 				},
-	// 				required: ['title', 'description', 'modules'],
-	// 			},
-	// 		},
-	// 	],
-	// 	function_call: { name: 'createCourseOutline' },
-	// })
-
-	// // return NextResponse.json({ response }, { status: 200 })
-
-	// if (
-	// 	typeof response.choices[0].message.function_call?.arguments === 'string' &&
-	// 	typeof JSON.parse(response.choices[0].message.function_call?.arguments) ===
-	// 		'object'
-	// ) {
-	// 	const pathwayObj = JSON.parse(
-	// 		response.choices[0].message.function_call?.arguments
-	// 	)
-	// 	const pathway = await db.pathway.create({
-	// 		data: {
-	// 			title: pathwayObj.title,
-	// 			description: pathwayObj.description,
-	// 			userId: user.id,
-	// 			Module: {
-	// 				createMany: {
-	// 					data: pathwayObj?.modules,
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	await db.message.create({
-	// 		data: {
-	// 			text:
-	// 				typeof response.choices[0].message.function_call?.arguments ===
-	// 				'string'
-	// 					? response.choices[0].message.function_call?.arguments
-	// 					: JSON.stringify(
-	// 							response.choices[0].message.function_call?.arguments
-	// 					  ),
-	// 			isUserMessage: false,
-	// 			pathwayId: pathway?.id,
-	// 			userId: user.id,
-	// 		},
-	// 	})
-
-	// 	return NextResponse.json({ pathway }, { status: 200 })
-	// } else {
-	// 	return new Response('Cannot generate content at the moment', {
-	// 		status: 400,
-	// 	})
-	// }
-
 	const pathway = await db.pathway.findFirst({
 		where: {
 			id: pathwayId,
@@ -149,16 +50,17 @@ export const POST = async (req: NextRequest) => {
 	}))
 
 	let response = await openai.chat.completions.create({
-		model: 'gpt-4o-mini',
+		model: 'gpt-4-turbo',
 		messages: [
 			{
 				role: 'system',
-				content:
-					"You're a teaching assistant and your job is to teach users by helping them generate detailed content for course modules. Ensure to explain concepts, with examples were necessary. Include images and links were necessary. Ensure that the links and images be linked to a valid source not an example url. Do not include quizzes or excercises.",
+				content: `
+					 You are a teacher and your job is to create detailed lecture notes(course content) for any module given by a user. Ensure all concepts are explained in detailed and not just listed out. Include links where necessary. Do not inlude quizzes or exercises at this point.
+					`,
 			},
 			{
 				role: 'user',
-				content: `Generate a course content for module ${moduleNumber}: ${moduleTitle} strictly in markdown format. Use the following pieces of information (which is in a stringified JSON format ) for context:
+				content: `Create a course content for module ${moduleNumber}: ${moduleTitle} strictly in markdown format. Use the following pieces of information (which is in a stringified JSON format ) for context on past messages:
 
                 \n----------------\n
 
@@ -173,8 +75,8 @@ export const POST = async (req: NextRequest) => {
 		],
 		functions: [
 			{
-				name: 'generateModuleContent',
-				description: 'Generate course content for a module ',
+				name: 'createContent',
+				description: 'Create course content for a module ',
 				parameters: {
 					type: 'object',
 					properties: {
@@ -188,7 +90,7 @@ export const POST = async (req: NextRequest) => {
 				},
 			},
 		],
-		function_call: { name: 'generateModuleContent' },
+		function_call: { name: 'createContent' },
 	})
 
 	if (

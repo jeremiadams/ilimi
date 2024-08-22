@@ -16,10 +16,35 @@ export const POST = async (req: NextRequest) => {
 
 	const { message } = SendMessageValidator.parse(body)
 
+	let validateMessageFromOpenAI = await openai.chat.completions.create({
+		model: 'gpt-4-turbo',
+		messages: [
+			{
+				role: 'system',
+				content:
+					"You're a teaching assistant and your job is to tell me if you can generate an intuitive course outline and lecture notes for any input i give you. Answer eiter yes or no.",
+			},
+			{
+				role: 'user',
+				content: `Can you generate a course for ${message}?`,
+			},
+		],
+	})
+
+	if (
+		validateMessageFromOpenAI.choices[0].message.content
+			?.toLowerCase()
+			.includes('no')
+	)
+		return new Response(
+			`Cannot generate learning pathway for ${message}. Kindly input something more intuitive.`,
+			{ status: 400 }
+		)
+
 	const firstUserMessage = `Create a course outline for ${message}. The course outline should be classified into modules and each module should contain a title and description.`
 
 	let response = await openai.chat.completions.create({
-		model: 'gpt-4o-mini',
+		model: 'gpt-4-turbo',
 		messages: [
 			{
 				role: 'system',

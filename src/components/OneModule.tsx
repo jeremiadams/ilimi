@@ -15,12 +15,7 @@ const OneModule: FC<OneModuleProps> = ({ title, description, content }) => {
 			<div className='pb-10 border-b border-[#27272A]'>
 				<div className=' max-w-[850px]'>
 					<h1 className='font-medium text-4xl capitalize'>{title}</h1>
-					<p className='pt-4'>
-						{/* Improve your web development skills in a variety of languages and
-						frameworks, including HTML, CSS, JavaScript, React, TypeScript, and
-						cutting-edge methods in AI. */}
-						{description}
-					</p>
+					<p className='pt-4'>{description}</p>
 				</div>
 			</div>
 			<div className='pt-10'>
