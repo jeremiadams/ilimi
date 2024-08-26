@@ -1,16 +1,12 @@
 'use client'
-import { FC, useState } from 'react'
+import { FC, useState, useContext } from 'react'
 import DashboardLayout from './DashboardLayout'
 import Module from './Module'
 import { useToast } from './ui/use-toast'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-
-interface Modules {
-	id: string
-	title: string | null
-	pathwayStatus: 'NOT_STARTED' | 'PENDING' | 'COMPLETED'
-}
+import { Modules } from '@/lib/types/Modules'
+import { AppContext } from '@/context/AppContext'
 
 interface OnePathwayProps {
 	title: string

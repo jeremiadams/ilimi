@@ -42,8 +42,6 @@ const Page: FC<PageProps> = async ({ params }) => {
 		},
 	})
 
-	console.log(pathway)
-
 	if (!pathway) notFound()
 
 	return (

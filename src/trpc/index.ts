@@ -76,5 +76,24 @@ export const appRouter = router({
 				},
 			})
 		}),
+	markModuleAsComplete: privateProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			})
+		)
+		.mutation(async ({ ctx, input }) => {
+			const { userId, user } = ctx
+			const { id } = input
+
+			return await db.module.update({
+				where: {
+					id,
+				},
+				data: {
+					pathwayStatus: 'COMPLETED',
+				},
+			})
+		}),
 })
 export type AppRouter = typeof appRouter

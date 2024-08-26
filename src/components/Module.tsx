@@ -79,7 +79,11 @@ const Module: FC<ModuleProps> = ({
 							}
 							className='sm:ml-10 shrink-0'
 						>
-							{pathwayStatus === 'NOT_STARTED' ? 'Start' : 'In progress'}
+							{pathwayStatus === 'NOT_STARTED'
+								? 'Start'
+								: pathwayStatus === 'COMPLETED'
+								? 'Completed'
+								: 'In progress'}
 						</Badge>
 					</div>
 				</button>
