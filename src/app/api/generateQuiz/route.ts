@@ -1,6 +1,6 @@
 import { db } from '@/db'
 import { openai } from '@/lib/openai'
-import { GenerateContentValidator } from '@/lib/validators/GenerateContentValidator'
+import { GenerateQuizValidator } from '@/lib/validators/GenerateQuizValidator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -14,8 +14,7 @@ export const POST = async (req: NextRequest) => {
 		return new Response('Unauthorized', { status: 401 })
 	}
 
-	const { moduleId, pathwayId, moduleNumber, moduleTitle } =
-		GenerateContentValidator.parse(body)
+	const { pathwayId, pathwayTitle } = GenerateQuizValidator.parse(body)
 
 	const pathway = await db.pathway.findFirst({
 		where: {
@@ -26,19 +25,11 @@ export const POST = async (req: NextRequest) => {
 
 	if (!pathway) return new Response('Not found', { status: 404 })
 
-	const singleModule = await db.module.findFirst({
-		where: {
-			id: moduleId,
-		},
-	})
-
-	if (singleModule?.content)
-		return NextResponse.json('Successfully fetched content', { status: 200 })
-
 	const prevMessages = await db.message.findMany({
 		where: {
 			pathwayId,
 		},
+		take: 2,
 		orderBy: {
 			createdAt: 'asc',
 		},
@@ -55,41 +46,68 @@ export const POST = async (req: NextRequest) => {
 			{
 				role: 'system',
 				content:
-					"You're a teaching assistant and your job is to teach users by helping them generate detailed content for course modules. Ensure to explain concepts, with examples were necessary. Include images and links were necessary. Ensure that the links and images be linked to a valid source not an example url. Do not include quizzes or excercises.",
+					"You're a teaching assistant and your job is to teach users by helping them generate multi choice questions and answers for courses already created.",
 			},
 			{
 				role: 'user',
-				content: `Generate a course content for module ${moduleNumber}: ${moduleTitle} strictly in markdown format. Use the following pieces of information (which is in a stringified JSON format ) for context:
+				content: `Generate a quiz with 20 questions for the course: ${pathwayTitle}. Use the following pieces of information (which is in a stringified JSON format ) for context on the course modules for ${pathwayTitle} that have already been generated:
 
-                \n----------------\n
+	            \n----------------\n
 
-                CONTEXT: 
-                ${formattedPrevMessages.map((message) => {
-									if (message.role === 'user')
-										return `User: ${message.content}\n`
-									return `Assistant: ${message.content}\n`
-								})}
-                `,
+	            CONTEXT:
+	            ${formattedPrevMessages.map((message) => {
+								if (message.role === 'user') return `User: ${message.content}\n`
+								return `Assistant: ${message.content}\n`
+							})}
+	            `,
 			},
 		],
 		functions: [
 			{
-				name: 'generateModuleContent',
-				description: 'Generate course content for a module ',
+				name: 'generateQuiz',
+				description: 'Generate a quiz for a course ',
 				parameters: {
 					type: 'object',
 					properties: {
-						courseContent: {
-							type: 'string',
+						questionsAndAnswers: {
+							type: 'array',
 							description:
-								'The detailed course content of a module, strictly in markdown format',
+								'An array of questions consisting of objects that have a question and an array of answers',
+							items: {
+								type: 'object',
+								properties: {
+									question: {
+										type: 'string',
+										description: 'The question',
+									},
+									answers: {
+										type: 'array',
+										description:
+											'An array of answers consisting of objects that have one correct answer and other wrong answers',
+										items: {
+											type: 'object',
+											properties: {
+												answer: {
+													type: 'string',
+													description: 'An answer to the question.',
+												},
+												isCorrect: {
+													type: 'boolean',
+													description:
+														'A boolean to describe if the answer is true or false',
+												},
+											},
+										},
+									},
+								},
+							},
 						},
 					},
-					required: ['courseContent'],
+					required: ['questionsAndAnswers'],
 				},
 			},
 		],
-		function_call: { name: 'generateModuleContent' },
+		function_call: { name: 'generateQuiz' },
 	})
 
 	if (
@@ -97,37 +115,12 @@ export const POST = async (req: NextRequest) => {
 		typeof JSON.parse(response.choices[0].message.function_call?.arguments) ===
 			'object'
 	) {
-		const courseContentObj = JSON.parse(
+		const quizContent = JSON.parse(
 			response.choices[0].message.function_call?.arguments
 		)
 
-		await db.module.update({
-			where: {
-				id: moduleId,
-			},
-			data: {
-				content: courseContentObj.courseContent,
-				pathwayStatus: 'PENDING',
-			},
-		})
-
-		await db.message.create({
-			data: {
-				text:
-					typeof response.choices[0].message.function_call?.arguments ===
-					'string'
-						? response.choices[0].message.function_call?.arguments
-						: JSON.stringify(
-								response.choices[0].message.function_call?.arguments
-						  ),
-				isUserMessage: true,
-				pathwayId,
-				userId: user.id,
-			},
-		})
-
-		return NextResponse.json('Successfully generated content', { status: 200 })
+		return NextResponse.json(quizContent, { status: 200 })
 	} else {
-		return new Response('Cannot generate pathway', { status: 400 })
+		return new Response('Error generating quiz', { status: 400 })
 	}
 }
