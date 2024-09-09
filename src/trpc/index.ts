@@ -3,6 +3,8 @@ import { privateProcedure, publicProcedure, router } from './trpc'
 import { TRPCError } from '@trpc/server'
 import { db } from '@/db'
 import { z } from 'zod'
+import { absoluteUrl } from '@/lib/utils'
+import { getUserSubscriptionPlan, paystack } from '@/lib/paystack'
 
 export const appRouter = router({
 	authCallback: publicProcedure.query(async () => {
@@ -95,5 +97,38 @@ export const appRouter = router({
 				},
 			})
 		}),
+	createPaystackSession: privateProcedure.mutation(async ({ ctx }) => {
+		const { userId } = ctx
+
+		const billingUrl = absoluteUrl('/dashboard/billing')
+
+		if (!userId) throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+		const dbUser = await db.user.findFirst({
+			where: {
+				id: userId,
+			},
+		})
+
+		if (!dbUser) throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+		const subscriptionPlan = await getUserSubscriptionPlan()
+
+		if (subscriptionPlan.isSubscribed && dbUser.paystackCustomerId) {
+			return { url: '/dashboard/billing-cancel' }
+		}
+
+		const paystackSession = await paystack.transaction.initialize({
+			email: dbUser.email,
+			amount: 950000,
+			plan: 'PLN_godnub7seozw24g',
+			metadata: {
+				userId: userId,
+			},
+			callback_url: '/dashboard/billing',
+		})
+
+		return { url: paystackSession.data.authorization_url }
+	}),
 })
 export type AppRouter = typeof appRouter

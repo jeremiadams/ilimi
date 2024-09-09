@@ -9,72 +9,6 @@ import { useState } from 'react'
 import { openai } from '@/lib/openai'
 
 export default function Home() {
-	// const [course, setCourse] = useState('basic algebra')
-
-	// const openai = new openai({
-
-	//   dangerouslyAllowBrowser: true
-	// })
-
-	// async function main() {
-	// 	let chat = await openai.chat.completions.create({
-	// 		model: 'gpt-4o-mini',
-	// 		messages: [
-	// 			{
-	// 				role: 'system',
-	// 				content:
-	// 					"You're a teaching assistant and your job is to help users generate courses, course outlines classified in modules and quizzes depending on the user request",
-	// 			},
-	// 			{
-	// 				role: 'user',
-	// 				content: `Create a course outline for ${course}. The course outline should be classified into modules and each module should contain a title and description.`,
-	// 			},
-	// 		],
-	// 		functions: [
-	// 			{
-	// 				name: 'createCourseOutline',
-	// 				description: 'Create a course outline for the user',
-	// 				parameters: {
-	// 					type: 'object',
-	// 					properties: {
-	// 						title: {
-	// 							type: 'string',
-	// 							description:
-	// 								'The title of the course the user wants to generate',
-	// 						},
-	// 						description: {
-	// 							type: 'string',
-	// 							description: 'An overview of what the course is about',
-	// 						},
-	// 						modules: {
-	// 							type: 'array',
-	// 							description:
-	// 								'An array of modules in the course outline consisting of objects that have a title and a description for that module',
-	// 							items: {
-	// 								type: 'object',
-	// 								properties: {
-	// 									title: {
-	// 										type: 'string',
-	// 									},
-	// 									description: {
-	// 										type: 'string',
-	// 									},
-	// 								},
-	// 							},
-	// 						},
-	// 					},
-	// 					required: ['modules'],
-	// 				},
-	// 			},
-	// 		],
-	// 		function_call: { name: 'createCourseOutline' },
-	// 	})
-
-	// 	console.log(typeof chat.choices[0].message.function_call?.arguments === 'string' ? JSON.parse(chat.choices[0].message.function_call?.arguments) :  'null')
-	// }
-
-	// main()
-
 	const icon = {
 		hidden: {
 			pathLength: 0,
@@ -834,12 +768,13 @@ export default function Home() {
   //bg-gradient-to-r from-[#3a015c] to-[#22007c] bg-clip-text text-transparent
             </div> */}
 				<h1 className='max-w-5xl text-5xl font-bold md:text-6xl lg:text-7xl text-white tracking-tighter leading-[1]'>
-					Generate personalized <span className=' text-[#f5cbb6]'>courses</span>{' '}
-					for anything in seconds.
+					Generate tailored{' '}
+					<span className=' text-[#f5cbb6]'>learning pathways </span> in
+					minutes.
 				</h1>
 				<p className=' mt-5 max-w-xl sm:text-2xl text-gray-300'>
-					Ilimi lets you generate courses, quizzes and a learning pathway for
-					any concept you want to learn. Personalize your learning now!
+					Ilimi lets you generate learning pathways, course content and quizzes
+					for any concept you want to learn. Personalize your learning now!
 				</p>
 				<Link
 					href='/dashboard'
