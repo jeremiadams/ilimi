@@ -3,20 +3,10 @@ import { paystack } from '@/lib/paystack'
 import { NextApiRequest } from 'next'
 import { headers } from 'next/headers'
 
-export const config = {
-	api: {
-		bodyParser: false,
-	},
-}
-
 const crypto = require('crypto')
 const secret = process.env.PAYSTACK_KEY
 
 export async function POST(request: NextApiRequest) {
-	if (request.method !== 'POST') {
-		return new Response('Method Not Allowed', { status: 405 })
-	}
-
 	const hash = crypto
 		.createHmac('sha512', secret)
 		.update(JSON.stringify(request.body))
