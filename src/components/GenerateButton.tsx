@@ -54,8 +54,8 @@ const GenerateButton: FC<GenerateButtonProps> = ({}) => {
 						<span className=' text-xl'>Generate learning pathway</span>
 					</DialogTitle>
 					<DialogDescription className='text-[#FAFAFA]'>
-						Input what you want to learn and we'll generate a learning pathway
-						for you.
+						Input what you want to learn and we&apos;ll generate a learning
+						pathway for you.
 					</DialogDescription>
 				</DialogHeader>
 				<div className='flex items-center space-x-2'>

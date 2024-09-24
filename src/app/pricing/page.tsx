@@ -81,7 +81,7 @@ const Page: FC<PageProps> = async ({}) => {
 							PLANS.find((p) => p.slug === plan.toLowerCase())?.price.amount ||
 							0
 						return (
-							<TooltipProvider>
+							<TooltipProvider key={plan}>
 								<div
 									key={plan}
 									className={cn('relative rounded-3xl text-white px-7 py-12', {

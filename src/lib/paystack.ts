@@ -2,7 +2,7 @@ import { PLANS } from '@/config/paystack'
 import { db } from '@/db'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 
-export const paystack = require('paystack')('')
+export const paystack = require('paystack')(process.env.PAYSTACK_KEY)
 
 export async function getUserSubscriptionPlan() {
 	const { getUser } = getKindeServerSession()
@@ -45,10 +45,10 @@ export async function getUserSubscriptionPlan() {
 	let isCanceled = false
 
 	if (isSubscribed && dbUser.paystackSubscriptionId) {
-		const paystackPlan = await paystack.subscriptions.get(
+		const paystackPlan = await paystack.subscription.get(
 			dbUser.paystackSubscriptionId
 		)
-		paystackPlan.status === 'active'
+		paystackPlan.data.status === 'active'
 			? (isCanceled = false)
 			: (isCanceled = true)
 	}

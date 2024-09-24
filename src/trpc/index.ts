@@ -100,7 +100,7 @@ export const appRouter = router({
 	createPaystackSession: privateProcedure.mutation(async ({ ctx }) => {
 		const { userId } = ctx
 
-		const billingUrl = absoluteUrl('/dashboard/billing')
+		const billingUrl = absoluteUrl('/dashboard/settings')
 
 		if (!userId) throw new TRPCError({ code: 'UNAUTHORIZED' })
 
@@ -121,11 +121,11 @@ export const appRouter = router({
 		const paystackSession = await paystack.transaction.initialize({
 			email: dbUser.email,
 			amount: 950000,
-			plan: 'PLN_godnub7seozw24g',
+			plan: process.env.PAYSTACK_PLAN_ID,
 			metadata: {
 				userId: userId,
 			},
-			callback_url: '/dashboard/billing',
+			callback_url: billingUrl,
 		})
 
 		return { url: paystackSession.data.authorization_url }

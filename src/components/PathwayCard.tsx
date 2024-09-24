@@ -38,7 +38,7 @@ const PathwayCard: FC<PathwayCardProps> = ({
 		>
 			<div className='flex flex-col gap-4'>
 				<h3 className=' font-semibold text-2xl'>
-					Learn <span>{title}</span>
+					<span>{title}</span>
 				</h3>
 				<p className=' line-clamp-3'>
 					{/* Improve your web development skills in a variety of languages and
