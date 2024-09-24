@@ -7,12 +7,6 @@ import { NextRequest } from 'next/server'
 const crypto = require('crypto')
 const secret = process.env.PAYSTACK_KEY
 
-export const config = {
-	api: {
-		bodyParser: false,
-	},
-}
-
 export async function POST(request: Request) {
 	const hash = crypto
 		.createHmac('sha512', secret)
@@ -25,6 +19,8 @@ export async function POST(request: Request) {
 		const rawBody = await getRawBody(request)
 		const event = JSON.parse(rawBody)
 		// const event = request.body
+		// const res = await request.json()
+		// const body = res.body
 		console.log('Weebhook event', event)
 		// Do something with event
 
