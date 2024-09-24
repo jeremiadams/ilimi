@@ -2,11 +2,18 @@ import { db } from '@/db'
 import { paystack } from '@/lib/paystack'
 import { NextApiRequest } from 'next'
 import { headers } from 'next/headers'
+import { NextRequest } from 'next/server'
 
 const crypto = require('crypto')
 const secret = process.env.PAYSTACK_KEY
 
-export async function POST(request: NextApiRequest) {
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+}
+
+export async function POST(request: Request) {
 	const hash = crypto
 		.createHmac('sha512', secret)
 		.update(JSON.stringify(request.body))
@@ -15,8 +22,10 @@ export async function POST(request: NextApiRequest) {
 
 	if (hash == signature) {
 		// Retrieve the request's body
-		const event = request.body
-		console.log(event)
+		const rawBody = await getRawBody(request)
+		const event = JSON.parse(rawBody)
+		// const event = request.body
+		console.log('Weebhook event', event)
 		// Do something with event
 
 		if (!event?.data?.customer.metadata.userId) {
@@ -58,4 +67,24 @@ export async function POST(request: NextApiRequest) {
 	}
 
 	return new Response(null, { status: 200 })
+}
+
+async function getRawBody(req: Request): Promise<string> {
+	const chunks: Uint8Array[] = []
+	const reader = req.body!.getReader()
+
+	let done: boolean | undefined
+	let value: Uint8Array | undefined
+
+	// Read the stream chunk by chunk
+	while (!done) {
+		;({ done, value } = await reader.read())
+		if (value) {
+			chunks.push(value)
+		}
+	}
+
+	// Concatenate all chunks into a single buffer and convert to string
+	const rawBody = Buffer.concat(chunks).toString('utf-8')
+	return rawBody
 }
