@@ -20,26 +20,12 @@ const Page = ({}) => {
 		router.push(origin ? `/${origin}` : 'dashboard')
 	} else if (isError) {
 		if (error.data?.code === 'UNAUTHORIZED') {
-			router.push('/sign-in')
+			router.push('/')
 		}
 	}
 
 	return (
-		<Suspense
-			fallback={
-				<>
-					<div className=' w-full mt-24 flex justify-center text-white'>
-						<div className='flex flex-col items-center'>
-							<Loading />
-							<h3 className=' font-semibold text-xl mt-2'>
-								Setting up your account...
-							</h3>
-							<p>You will be redirected automatically</p>
-						</div>
-					</div>
-				</>
-			}
-		>
+		<Suspense>
 			<div className=' w-full mt-24 flex justify-center text-white'>
 				<div className='flex flex-col items-center'>
 					<Loading />
