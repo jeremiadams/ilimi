@@ -40,12 +40,7 @@ const PathwayCard: FC<PathwayCardProps> = ({
 				<h3 className=' font-semibold text-2xl'>
 					<span>{title}</span>
 				</h3>
-				<p className=' line-clamp-3'>
-					{/* Improve your web development skills in a variety of languages and
-					frameworks, including HTML, CSS, JavaScript, React, TypeScript, and
-					cutting-edge methods in AI. */}
-					{description}
-				</p>
+				<p className=' line-clamp-3'>{description}</p>
 			</div>
 			<div className='flex flex-col'>
 				{/* <span className=''>Continue learning:</span> */}

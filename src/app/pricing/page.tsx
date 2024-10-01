@@ -10,7 +10,10 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { Check, HelpCircle, Minus } from 'lucide-react'
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
+import {
+	getKindeServerSession,
+	RegisterLink,
+} from '@kinde-oss/kinde-auth-nextjs/server'
 import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 import UpgradeButton from '@/components/UpgradeButton'
@@ -144,23 +147,24 @@ const Page: FC<PageProps> = async ({}) => {
 									</ul>
 									<div className=''>
 										{plan === 'Free' ? (
-											<Link
-												href={user ? '/dashboard' : '/sign-in'}
-												className={buttonVariants({
-													className:
-														'w-full bg-[#1e1922] hover:bg-[#312a37] text-white rounded-md py-3',
-													variant: 'hero',
-													size: 'icon',
-												})}
-											>
-												{user ? 'Upgrade now' : 'Sign in'}
-												<ArrowRightIcon className='ml-2 h-4 w-4' />
-											</Link>
+											user ? (
+												<UpgradeButton />
+											) : (
+												<RegisterLink
+													className={buttonVariants({
+														className:
+															'w-full bg-[#1e1922] hover:bg-[#312a37] text-white rounded-md py-3',
+														variant: 'hero',
+														size: 'icon',
+													})}
+												>
+													Sign up <ArrowRightIcon className='ml-2 h-4 w-4' />
+												</RegisterLink>
+											)
 										) : user ? (
 											<UpgradeButton />
 										) : (
-											<Link
-												href='sign-in'
+											<RegisterLink
 												className={buttonVariants({
 													className:
 														'w-full bg-[#1e1922] hover:bg-[#312a37] text-white rounded-md py-3',
@@ -168,9 +172,8 @@ const Page: FC<PageProps> = async ({}) => {
 													size: 'icon',
 												})}
 											>
-												{user ? 'Upgrade now' : 'Sign up'}
-												<ArrowRightIcon className='ml-2 h-4 w-4' />
-											</Link>
+												Sign up <ArrowRightIcon className='ml-2 h-4 w-4' />
+											</RegisterLink>
 										)}
 									</div>
 								</div>

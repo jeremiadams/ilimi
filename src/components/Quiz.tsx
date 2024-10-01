@@ -1,5 +1,7 @@
+'use client'
+
 import { FC } from 'react'
-import DashboardLayout from './DashboardLayout'
+import DashboardLayout from './DashboardNav'
 import { buttonVariants } from './ui/button'
 import { QuestionsAndAnswers } from '@/lib/types/QuestionsAndAnswers'
 import { cn } from '@/lib/utils'

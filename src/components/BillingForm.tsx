@@ -43,7 +43,7 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 
 	return (
 		<form onSubmit={(e) => e.preventDefault()}>
-			<Card>
+			<Card className='bg-[#09090b] max-w-[800px] border-0 text-[#FAFAFA]'>
 				<CardHeader>
 					<CardTitle>Subscription Plan</CardTitle>
 					<CardDescription>
@@ -59,7 +59,7 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 						{loading ? (
 							<Loader2 className=' animate-spin' />
 						) : subscriptionPlan.isSubscribed ? (
-							'Cancel subscription'
+							'Cancel Subscription'
 						) : (
 							'Upgrade to PRO'
 						)}

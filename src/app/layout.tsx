@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import Navbar from '@/components/Navbar'
 import Providers from '@/components/Providers'
 import { Toaster } from '@/components/ui/toaster'
+import { AppContextProvider } from '@/context/AppContext'
 
 const inter = Inter({
 	weight: ['400', '500', '600', '700', '800', '900'],
@@ -26,17 +27,19 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<Providers>
-				<body
-					className={cn(
-						' min-h-screen font-sans antialiased grainy',
-						inter.variable,
-						opensans.variable,
-						'font-inter'
-					)}
-				>
-					{children}
-					<Toaster />
-				</body>
+				<AppContextProvider>
+					<body
+						className={cn(
+							' min-h-screen font-sans antialiased grainy',
+							inter.variable,
+							opensans.variable,
+							'font-inter'
+						)}
+					>
+						{children}
+						<Toaster />
+					</body>
+				</AppContextProvider>
 			</Providers>
 		</html>
 	)

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import DashboardLayout from './DashboardLayout'
+import DashboardLayout from './DashboardNav'
 import ReactMarkdown from 'react-markdown'
 import { cn } from '@/lib/utils'
 import { trpc } from '@/app/_trpc/client'
@@ -38,7 +38,7 @@ const OneModule: FC<OneModuleProps> = async ({
 	})
 
 	return (
-		<DashboardLayout>
+		<>
 			<div className='pb-10 border-b border-[#27272A]'>
 				<div className=' max-w-[850px]'>
 					<h1 className='font-medium text-4xl capitalize'>{title}</h1>
@@ -63,7 +63,7 @@ const OneModule: FC<OneModuleProps> = async ({
 					nextModuleContent={nextModule?.content ? true : false}
 				/>
 			</div>
-		</DashboardLayout>
+		</>
 	)
 }
 

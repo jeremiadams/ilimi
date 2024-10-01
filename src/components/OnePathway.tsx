@@ -1,6 +1,6 @@
 'use client'
 import { FC, useState, useContext } from 'react'
-import DashboardLayout from './DashboardLayout'
+import DashboardLayout from './DashboardNav'
 import Module from './Module'
 import { useToast } from './ui/use-toast'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -182,7 +182,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 	}
 
 	return (
-		<DashboardLayout>
+		<>
 			<div className='pb-10 border-b border-[#27272A]'>
 				<div className=' max-w-[850px]'>
 					<h1 className='font-medium text-4xl capitalize'>{title}</h1>
@@ -212,7 +212,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 				score={score}
 				resetQuiz={resetQuiz}
 			/>
-		</DashboardLayout>
+		</>
 	)
 }
 

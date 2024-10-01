@@ -1,4 +1,3 @@
-'use client'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { buttonVariants } from '@/components/ui/button'
 import { ArrowRightIcon } from '@radix-ui/react-icons'
@@ -7,6 +6,7 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { useState } from 'react'
 import { openai } from '@/lib/openai'
+import { RegisterLink } from '@kinde-oss/kinde-auth-nextjs'
 
 export default function Home() {
 	const icon = {
@@ -787,6 +787,15 @@ export default function Home() {
 				>
 					Sign up for free <ArrowRightIcon className='ml-2 h-4 w-4' />
 				</Link>
+				{/* <RegisterLink
+            className={buttonVariants({
+              size: 'hero',
+              variant: 'hero',
+              className: 'mt-5 bg-white text-black text-base hover:bg-gray-200',
+            })}
+          >
+            Sign up for free <ArrowRightIcon className='ml-2 h-4 w-4' />
+          </RegisterLink> */}
 			</MaxWidthWrapper>
 
 			<div>
