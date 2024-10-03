@@ -115,7 +115,7 @@ export const appRouter = router({
 		const subscriptionPlan = await getUserSubscriptionPlan()
 
 		if (subscriptionPlan.isSubscribed && dbUser.paystackCustomerId) {
-			return { url: '/dashboard/billing-cancel' }
+			return { url: absoluteUrl('/dashboard/settings') }
 		}
 
 		const paystackSession = await paystack.transaction.initialize({

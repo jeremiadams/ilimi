@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Open_Sans } from 'next/font/google'
 import './globals.css'
-import { cn } from '@/lib/utils'
+import { cn, constructMetadata } from '@/lib/utils'
 import Navbar from '@/components/Navbar'
 import Providers from '@/components/Providers'
 import { Toaster } from '@/components/ui/toaster'
@@ -18,6 +18,8 @@ const opensans = Open_Sans({
 	variable: '--font-opensans',
 	subsets: ['latin'],
 })
+
+export const metadata = constructMetadata()
 
 export default function RootLayout({
 	children,
