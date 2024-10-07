@@ -1,5 +1,7 @@
+import { PLANS } from '@/config/paystack'
 import { db } from '@/db'
 import { openai } from '@/lib/openai'
+import { getUserSubscriptionPlan } from '@/lib/paystack'
 import { SendMessageValidator } from '@/lib/validators/SendMessageValidator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
@@ -12,6 +14,28 @@ export const POST = async (req: NextRequest) => {
 
 	if (!user || !user.id) {
 		return new Response('Unauthorized', { status: 401 })
+	}
+
+	const subscriptionPlan = await getUserSubscriptionPlan()
+
+	const pathwaysAmt = await db.pathway.findMany({
+		where: {
+			id: user?.id,
+		},
+	})
+
+	console.log(pathwaysAmt)
+
+	const isProExceeded =
+		pathwaysAmt.length > PLANS.find((plan) => plan.name === 'Pro')!?.quota
+	const isFreeExceeded =
+		pathwaysAmt.length > PLANS.find((plan) => plan.name === 'Free')!?.quota
+
+	if (
+		(subscriptionPlan.isSubscribed && isProExceeded) ||
+		(!subscriptionPlan.isSubscribed && isFreeExceeded)
+	) {
+		return new Response('Maximum amount of pathways generated', { status: 403 })
 	}
 
 	const { message } = SendMessageValidator.parse(body)

@@ -42,12 +42,18 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 		})
 
 	return (
-		<form onSubmit={(e) => e.preventDefault()}>
+		<form
+			onSubmit={(e) => {
+				e.preventDefault()
+				createPaystackSession()
+			}}
+		>
 			<Card className='bg-[#09090b] max-w-[800px] border-0 text-[#FAFAFA]'>
 				<CardHeader>
 					<CardTitle>Subscription Plan</CardTitle>
 					<CardDescription>
-						You are currently on the <strong>{}</strong> plan
+						You are currently on the <strong>{subscriptionPlan.name}</strong>{' '}
+						plan
 					</CardDescription>
 				</CardHeader>
 				<CardFooter className='flex flex-col gap-3 items-start md:flex-row justify-between md:gap-0'>
@@ -55,11 +61,12 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 						size='dashboard'
 						variant='hero'
 						className='h-10 rounded-md px-5'
+						type='submit'
 					>
 						{loading ? (
 							<Loader2 className=' animate-spin' />
 						) : subscriptionPlan.isSubscribed ? (
-							'Cancel Subscription'
+							'Manage Subscription'
 						) : (
 							'Upgrade to PRO'
 						)}
