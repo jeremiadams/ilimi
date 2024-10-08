@@ -16,8 +16,8 @@ export async function POST(request: Request) {
 
 	if (hash == signature) {
 		// Retrieve the request's body
-		const rawBody = await getRawBody(request)
-		const event = JSON.parse(rawBody)
+		const event = await request.json()
+		// const event = JSON.parse(rawBody)
 		// const event = request.body
 		// const res = await request.json()
 		// const body = res.body
@@ -95,22 +95,22 @@ export async function POST(request: Request) {
 	return new Response(null, { status: 200 })
 }
 
-async function getRawBody(req: Request): Promise<string> {
-	const chunks: Uint8Array[] = []
-	const reader = req.body!.getReader()
+// async function getRawBody(req: Request): Promise<string> {
+// 	const chunks: Uint8Array[] = []
+// 	const reader = req.body!.getReader()
 
-	let done: boolean | undefined
-	let value: Uint8Array | undefined
+// 	let done: boolean | undefined
+// 	let value: Uint8Array | undefined
 
-	// Read the stream chunk by chunk
-	while (!done) {
-		;({ done, value } = await reader.read())
-		if (value) {
-			chunks.push(value)
-		}
-	}
+// 	// Read the stream chunk by chunk
+// 	while (!done) {
+// 		;({ done, value } = await reader.read())
+// 		if (value) {
+// 			chunks.push(value)
+// 		}
+// 	}
 
-	// Concatenate all chunks into a single buffer and convert to string
-	const rawBody = Buffer.concat(chunks).toString('utf-8')
-	return rawBody
-}
+// 	// Concatenate all chunks into a single buffer and convert to string
+// 	const rawBody = Buffer.concat(chunks).toString('utf-8')
+// 	return rawBody
+// }
