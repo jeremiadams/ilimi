@@ -130,5 +130,23 @@ export const appRouter = router({
 
 		return { url: paystackSession.data.authorization_url }
 	}),
+	disableSubscription: privateProcedure.mutation(async ({ ctx }) => {
+		const { userId } = ctx
+
+		if (!userId) throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+		const dbUser = await db.user.findFirst({
+			where: {
+				id: userId,
+			},
+		})
+
+		const paystackSession = await paystack.subscription.disable({
+			code: dbUser?.paystackSubscriptionId,
+			token: dbUser?.paystackEmailToken,
+		})
+
+		return { paystackSession }
+	}),
 })
 export type AppRouter = typeof appRouter

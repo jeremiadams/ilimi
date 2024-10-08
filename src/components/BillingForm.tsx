@@ -41,10 +41,27 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 			},
 		})
 
+	const { mutate: disableSubscription } = trpc.disableSubscription.useMutation({
+		onSuccess: ({}) => {
+			setLoading(false)
+			toast({
+				title: `Successfully disabled subscription.`,
+				description: 'Will miss you as a Pro memeber',
+				variant: 'default',
+			})
+		},
+		onMutate: () => {
+			setLoading(true)
+		},
+	})
+
 	return (
 		<form
 			onSubmit={(e) => {
 				e.preventDefault()
+				if (subscriptionPlan.isSubscribed) {
+					disableSubscription()
+				}
 				createPaystackSession()
 			}}
 		>
@@ -56,7 +73,7 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 						plan
 					</CardDescription>
 				</CardHeader>
-				<CardFooter className='flex flex-col gap-3 items-start md:flex-row justify-between md:gap-0'>
+				<CardFooter className='flex flex-col gap-3 items-start md:flex-row md:items-center md:justify-between'>
 					<Button
 						size='dashboard'
 						variant='hero'
@@ -72,11 +89,11 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 						)}
 					</Button>
 					{subscriptionPlan.isSubscribed ? (
-						<p className=' rounded-full text-xs font-medium'>
+						<p className=' rounded-full text-sm font-medium'>
 							{subscriptionPlan.isCanceled
 								? 'Your subscription will be canceled on'
-								: 'Your subscription renews on'}
-							{format(subscriptionPlan.paystackCurrentPeriodEnd!, 'dd,MM,yyyy')}
+								: 'Your subscription renews on '}
+							{format(subscriptionPlan.paystackCurrentPeriodEnd!, 'dd.MM.yyyy')}
 							.
 						</p>
 					) : null}
