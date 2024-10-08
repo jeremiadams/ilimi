@@ -32,14 +32,14 @@ const DashboardNav = ({ user }: { user: KindeUser | null }) => {
 				<nav className='flex flex-col justify-between h-full w-full px-3 sm:py-10'>
 					<div className='flex flex-col gap-1'>
 						<div className='flex items-center gap-2 z-40 justify-center md:justify-normal md:ml-2 text-[#FAFAFA] mb-5'>
-							<div className='bg-[#7058d0] flex justify-center items-center font-semibold text-sm text-black h-10 w-10 rounded-md'>
+							<div className='bg-[#7058d0] flex justify-center uppercase items-center font-semibold text-sm text-black h-10 w-10 rounded-md'>
 								{user?.given_name
 									? user?.given_name.charAt(0).toUpperCase()
 									: user?.family_name
 									? user?.family_name.charAt(0).toUpperCase()
-									: 'U'}
+									: 'YA'}
 							</div>
-							<span className='hidden md:block font-medium text-[#FAFAFA]'>
+							<span className='hidden md:block font-medium capitalize text-[#FAFAFA]'>
 								{user?.given_name
 									? user?.given_name
 									: user?.family_name

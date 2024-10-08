@@ -7,6 +7,7 @@ interface SettingsProps {}
 
 const Settings: FC<SettingsProps> = async ({}) => {
 	const subscriptionPlan = await getUserSubscriptionPlan()
+	console.log(subscriptionPlan)
 
 	return (
 		<div>

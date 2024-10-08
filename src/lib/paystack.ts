@@ -39,8 +39,8 @@ export async function getUserSubscriptionPlan() {
 	)
 
 	const plan = isSubscribed
-		? PLANS.find((plan) => plan.price.priceIds.test === dbUser.paystackPriceId)
-		: null
+		? PLANS.find((plan) => plan.name === 'Pro')
+		: PLANS.find((plan) => plan.name === 'Free')
 
 	let isCanceled = false
 

@@ -44,14 +44,44 @@ export async function POST(request: Request) {
 			})
 		}
 
+		if (event && event.event === 'charge.success') {
+			if (event.data.status !== 'success') {
+				await db.user.update({
+					where: {
+						id: event?.data?.metadata.userId,
+					},
+					data: {
+						paystackCurrentPeriodEnd: null,
+					},
+				})
+			}
+		}
+
 		if (event && event.event === 'invoice.update') {
+			if (event.data.status === 'success') {
+				await db.user.update({
+					where: {
+						paystackSubscriptionId:
+							event?.data?.subscription?.subscription_code,
+					},
+					data: {
+						paystackCurrentPeriodEnd:
+							event?.data?.subscription?.next_payment_date,
+					},
+				})
+			}
+		}
+
+		if (event && event.event === 'subscription.disable') {
 			await db.user.update({
 				where: {
-					paystackSubscriptionId: event?.data?.subscription?.subscription_code,
+					id: event?.data?.customer.metadata.userId,
 				},
 				data: {
-					paystackCurrentPeriodEnd:
-						event?.data?.subscription?.next_payment_date,
+					paystackSubscriptionId: null,
+					paystackCustomerId: null,
+					paystackPriceId: null,
+					paystackCurrentPeriodEnd: null,
 				},
 			})
 		}
