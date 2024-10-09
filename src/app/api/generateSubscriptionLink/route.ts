@@ -2,11 +2,11 @@ import axios from 'axios'
 import { db } from '@/db'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
+export const POST = async (req: NextRequest, res: NextResponse) => {
 	if (req.method !== 'POST') {
-		return res.status(405).json({ message: 'Method Not Allowed' })
+		return new Response('Method Not Allowed', { status: 405 })
 	}
 
 	const { getUser } = getKindeServerSession()
@@ -42,10 +42,6 @@ export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 			'Error initializing payment:',
 			error.response?.data || error.message
 		)
-		res.status(500).json({
-			status: 'error',
-			message: 'Failed to initialize payment',
-			error: error.response?.data.message || error.message,
-		})
+		return new Response('Failed to initialize payment', { status: 500 })
 	}
 }
