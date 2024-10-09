@@ -14,6 +14,7 @@ import {
 import { Button } from './ui/button'
 import { Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 interface BillingFormProps {
 	subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>
@@ -41,17 +42,38 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 			},
 		})
 
-	const { mutate: disableSubscription } = trpc.disableSubscription.useMutation({
-		onSuccess: ({}) => {
-			setLoading(false)
-			toast({
-				title: `Successfully disabled subscription.`,
-				description: 'Will miss you as a Pro memeber',
-				variant: 'default',
+	const { mutate: generateSubscriptionLink } = useMutation({
+		mutationFn: async () => {
+			const response = await fetch('/api/generateSubscriptionLink', {
+				method: 'POST',
+				body: JSON.stringify({
+					'': '',
+				}),
 			})
+
+			if (!response.ok) {
+				throw new Error(`Error generating link`)
+			}
+
+			const result = await response.json()
+			return result
+		},
+		onSuccess: (data) => {
+			setLoading(false)
+			window.location.href = data.data.link
 		},
 		onMutate: () => {
 			setLoading(true)
+		},
+		onSettled: () => {
+			setLoading(false)
+		},
+		onError: (error) => {
+			return toast({
+				title: error.message,
+				description: 'Please try again later',
+				variant: 'destructive',
+			})
 		},
 	})
 
@@ -60,7 +82,8 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 			onSubmit={(e) => {
 				e.preventDefault()
 				if (subscriptionPlan.isSubscribed) {
-					disableSubscription()
+					generateSubscriptionLink()
+					return
 				}
 				createPaystackSession()
 			}}
@@ -91,7 +114,7 @@ const BillingForm: FC<BillingFormProps> = ({ subscriptionPlan }) => {
 					{subscriptionPlan.isSubscribed ? (
 						<p className=' rounded-full text-sm font-medium'>
 							{subscriptionPlan.isCanceled
-								? 'Your subscription will be canceled on'
+								? 'Your subscription will be canceled on '
 								: 'Your subscription renews on '}
 							{format(subscriptionPlan.paystackCurrentPeriodEnd!, 'dd.MM.yyyy')}
 							.

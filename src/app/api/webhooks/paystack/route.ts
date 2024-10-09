@@ -1,23 +1,9 @@
 import { db } from '@/db'
-import { paystack } from '@/lib/paystack'
-import { NextApiRequest } from 'next'
-import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-
-const crypto = require('crypto')
-const secret = process.env.PAYSTACK_KEY
 
 const WHITELISTED_IPS = ['52.31.139.75', '52.49.173.169', '52.214.14.220']
 
 export async function POST(request: NextRequest) {
-	// const hash = crypto
-	// 	.createHmac('sha512', secret)
-	// 	.update(JSON.stringify(request.body))
-	// 	.digest('hex')
-	// const signature = headers().get('x-paystack-signature') ?? ''
-	// console.log(hash)
-	// console.log(signature)
-
 	const clientIp = getClientIp(request)
 
 	if (!WHITELISTED_IPS.includes(clientIp)) {
@@ -27,21 +13,8 @@ export async function POST(request: NextRequest) {
 	}
 
 	const event = await request.json()
+
 	try {
-		// Retrieve the request's body
-		// const event = JSON.parse(rawBody)
-		// const event = request.body
-		// const res = await request.json()
-		// const body = res.body
-		console.log('Weebhook event', event)
-		// Do something with event
-
-		// if (!event?.data?.customer.metadata.userId) {
-		// 	return new Response('Not a valid user', {
-		// 		status: 400,
-		// 	})
-		// }
-
 		if (event && event.event === 'subscription.create') {
 			await db.user.update({
 				where: {
@@ -91,10 +64,14 @@ export async function POST(request: NextRequest) {
 			return new Response(null, { status: 200 })
 		}
 
+		if (event && event.event === 'subscription.not_renew') {
+			return new Response(null, { status: 200 })
+		}
+
 		if (event && event.event === 'subscription.disable') {
 			await db.user.update({
 				where: {
-					id: event?.data?.customer.metadata.userId,
+					email: event?.data?.customer?.email,
 				},
 				data: {
 					paystackSubscriptionId: null,
@@ -114,26 +91,6 @@ export async function POST(request: NextRequest) {
 		)
 	}
 }
-
-// async function getRawBody(req: Request): Promise<string> {
-// 	const chunks: Uint8Array[] = []
-// 	const reader = req.body!.getReader()
-
-// 	let done: boolean | undefined
-// 	let value: Uint8Array | undefined
-
-// 	// Read the stream chunk by chunk
-// 	while (!done) {
-// 		;({ done, value } = await reader.read())
-// 		if (value) {
-// 			chunks.push(value)
-// 		}
-// 	}
-
-// 	// Concatenate all chunks into a single buffer and convert to string
-// 	const rawBody = Buffer.concat(chunks).toString('utf-8')
-// 	return rawBody
-// }
 
 function getClientIp(req: NextRequest): string {
 	// Use the IP provided by the request object (this works for Edge Functions)
