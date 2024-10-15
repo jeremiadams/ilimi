@@ -11,7 +11,7 @@ import { openai } from '@/lib/openai'
 import { RegisterLink } from '@kinde-oss/kinde-auth-nextjs'
 
 const DURATION = 0.25
-const STAGGER = 0.04
+const STAGGER = 0.025
 
 export default function Home() {
 	// const icon = {
@@ -888,21 +888,47 @@ export default function Home() {
 						)
 					})}{' '}
 				</motion.h1>
-				<p className=' mt-5 max-w-xl sm:text-2xl text-gray-300'>
+				<motion.p
+					className=' mt-5 max-w-xl sm:text-2xl text-gray-300'
+					initial={{ y: 40, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{
+						duration: 2,
+						ease: 'easeInOut',
+					}}
+				>
 					Ilimi lets you generate learning pathways, course content and quizzes
 					for any concept you want to learn. Personalize your learning now!
-				</p>
-				<Link
-					href='/dashboard'
-					target='_blank'
-					className={buttonVariants({
-						size: 'hero',
-						variant: 'hero',
-						className: 'mt-5 bg-white text-black text-base hover:bg-gray-200',
-					})}
+				</motion.p>
+				<motion.div
+					initial={{ y: 40, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{
+						duration: 2,
+						ease: 'easeInOut',
+					}}
 				>
-					Sign up for free <ArrowRightIcon className='ml-2 h-4 w-4' />
-				</Link>
+					{/* <Link
+						href='/dashboard'
+						target='_blank'
+						className={buttonVariants({
+							size: 'hero',
+							variant: 'hero',
+							className: 'mt-5 bg-white text-black text-base hover:bg-gray-200',
+						})}
+					>
+						Sign up for free <ArrowRightIcon className='ml-2 h-4 w-4' />
+					</Link> */}
+					<RegisterLink
+						className={buttonVariants({
+							size: 'hero',
+							variant: 'hero',
+							className: 'mt-5 bg-white text-black text-base hover:bg-gray-200',
+						})}
+					>
+						Sign up for free <ArrowRightIcon className='ml-2 h-4 w-4' />
+					</RegisterLink>
+				</motion.div>
 				{/* <RegisterLink
             className={buttonVariants({
               size: 'hero',
