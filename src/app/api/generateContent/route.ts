@@ -4,6 +4,8 @@ import { GenerateContentValidator } from '@/lib/validators/GenerateContentValida
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const maxDuration = 300
+
 export const POST = async (req: NextRequest) => {
 	const body = await req.json()
 

@@ -1,24 +1,29 @@
+'use client'
+
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
 import { buttonVariants } from '@/components/ui/button'
 import { ArrowRightIcon } from '@radix-ui/react-icons'
-import { motion } from 'framer-motion'
+import { animate, motion } from 'framer-motion'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { useState } from 'react'
 import { openai } from '@/lib/openai'
 import { RegisterLink } from '@kinde-oss/kinde-auth-nextjs'
 
+const DURATION = 0.25
+const STAGGER = 0.04
+
 export default function Home() {
-	const icon = {
-		hidden: {
-			pathLength: 0,
-			// fill: "rgba(255, 255, 255, 1)"
-		},
-		visible: {
-			pathLength: 1,
-			// fill: "rgba(255, 255, 255, 0) "
-		},
-	}
+	// const icon = {
+	// 	hidden: {
+	// 		pathLength: 0,
+	// 		// fill: "rgba(255, 255, 255, 1)"
+	// 	},
+	// 	visible: {
+	// 		pathLength: 1,
+	// 		// fill: "rgba(255, 255, 255, 0) "
+	// 	},
+	// }
 	//mb-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center
 
 	return (
@@ -767,11 +772,122 @@ export default function Home() {
 				{/* <div className=" mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 px-7 py-2 shadow-md backdrop-blur transition-all">
   //bg-gradient-to-r from-[#3a015c] to-[#22007c] bg-clip-text text-transparent
             </div> */}
-				<h1 className='max-w-5xl text-5xl font-bold md:text-6xl lg:text-7xl text-white tracking-tighter leading-[1]'>
-					Generate tailored{' '}
-					<span className=' text-[#f5cbb6]'>learning pathways </span> in
-					minutes.
-				</h1>
+				<motion.h1
+					className='max-w-5xl text-5xl font-bold md:text-6xl lg:text-7xl text-white tracking-tighter leading-[1]'
+					// initial='initial'
+					// animate='animate'
+				>
+					{`Generate`.split('').map((l, i) => {
+						return (
+							<motion.p
+								key={i}
+								initial={{ scale: 0 }}
+								animate={{ scale: [0, 1.6, 1] }}
+								transition={{
+									duration: DURATION,
+									ease: 'easeInOut',
+									delay: STAGGER * i,
+								}}
+								className='inline-block'
+							>
+								{l}
+							</motion.p>
+						)
+					})}{' '}
+					{'tailored'.split('').map((l, i) => {
+						return (
+							<motion.span
+								key={i}
+								initial={{ scale: 0 }}
+								animate={{ scale: [0, 1.6, 1] }}
+								transition={{
+									duration: DURATION,
+									ease: 'easeInOut',
+									delay: STAGGER * 7,
+								}}
+								className=' inline-block'
+							>
+								{l}
+							</motion.span>
+						)
+					})}{' '}
+					{'learning'.split('').map((l, i) => {
+						return (
+							<motion.span
+								key={i}
+								initial={{ scale: 0, color: '#FFFFFF' }}
+								animate={{
+									scale: [0, 1.6, 1],
+									color: ['#FFFFFF', '#FFFFFF', '#f5cbb6'],
+								}}
+								transition={{
+									duration: DURATION,
+									ease: 'easeInOut',
+									delay: STAGGER * 15,
+								}}
+								className=' inline-block'
+							>
+								{l}
+							</motion.span>
+						)
+					})}{' '}
+					<br />
+					{'pathways'.split('').map((l, i) => {
+						return (
+							<motion.span
+								key={i}
+								initial={{ scale: 0, color: '#FFFFFF' }}
+								animate={{
+									scale: [0, 1.6, 1],
+									color: ['#FFFFFF', '#FFFFFF', '#f5cbb6'],
+								}}
+								transition={{
+									duration: DURATION,
+									ease: 'easeInOut',
+									delay: STAGGER * 23,
+								}}
+								className=' inline-block'
+							>
+								{l}
+							</motion.span>
+						)
+					})}{' '}
+					{/* <span className=' text-[#f5cbb6]'> learning pathways </span>  */}
+					{'in'.split('').map((l, i) => {
+						return (
+							<motion.span
+								key={i}
+								initial={{ scale: 0 }}
+								animate={{ scale: [0, 1.6, 1] }}
+								transition={{
+									duration: DURATION,
+									ease: 'easeInOut',
+									delay: STAGGER * 31,
+								}}
+								className=' inline-block'
+							>
+								{l}
+							</motion.span>
+						)
+					})}{' '}
+					{'minutes'.split('').map((l, i) => {
+						return (
+							<motion.span
+								key={i}
+								initial={{ scale: 0 }}
+								animate={{ scale: [0, 1.6, 1] }}
+								transition={{
+									duration: DURATION,
+									ease: 'easeInOut',
+									delay: STAGGER * 33,
+								}}
+								className=' inline-block'
+							>
+								{l}
+							</motion.span>
+						)
+					})}{' '}
+				</motion.h1>
 				<p className=' mt-5 max-w-xl sm:text-2xl text-gray-300'>
 					Ilimi lets you generate learning pathways, course content and quizzes
 					for any concept you want to learn. Personalize your learning now!

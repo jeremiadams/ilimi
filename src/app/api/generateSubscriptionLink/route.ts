@@ -4,6 +4,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const maxDuration = 300
+
 export const POST = async (req: NextRequest, res: NextResponse) => {
 	if (req.method !== 'POST') {
 		return new Response('Method Not Allowed', { status: 405 })
