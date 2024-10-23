@@ -76,7 +76,7 @@ export default function Home() {
 	return (
 		<>
 			<Navbar />
-			<MaxWidthWrapper className='pb-12 pt-20 sm:pt-40 flex flex-col items-center justify-center text-center relative z-10'>
+			<MaxWidthWrapper className='pb-12 pt-12 sm:pt-40 flex flex-col items-center justify-center text-center relative z-10'>
 				<motion.h1 className='max-w-5xl text-6xl sm:text-5xl font-bold md:text-6xl lg:text-7xl text-white tracking-tighter leading-[1]'>
 					<SplitText
 						initial={{ y: '100%' }}
