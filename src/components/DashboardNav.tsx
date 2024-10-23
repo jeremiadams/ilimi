@@ -100,30 +100,6 @@ const DashboardNav = ({ user }: { user: KindeUser | null }) => {
 							</TooltipTrigger>
 							<TooltipContent side='right'>Settings</TooltipContent>
 						</Tooltip>
-						{/* <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Link
-                                        href='#'
-                                        className='flex text-[#A1A1AA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2 text-lg'
-                                    >
-                                        <Shapes className='h-[18px] w-[18px]' />
-                                        <span className=''>Courses</span>
-                                    </Link>
-                                </TooltipTrigger>
-                                <TooltipContent side='right'>Courses</TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Link
-                                        href='#'
-                                        className='flex text-[#A1A1AA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2 text-lg'
-                                    >
-                                        <UserRound className='h-[18px] w-[18px]' />
-                                        <span className=''>Profile</span>
-                                    </Link>
-                                </TooltipTrigger>
-                                <TooltipContent side='right'>Profile</TooltipContent>
-                            </Tooltip> */}
 					</div>
 					<div>
 						<Tooltip>
@@ -156,9 +132,9 @@ const DashboardNav = ({ user }: { user: KindeUser | null }) => {
 						</SheetTrigger>
 						<SheetContent
 							side='left'
-							className='sm:max-w-xs border-0 bg-[#09090b]'
+							className='sm:max-w-xs border-0 bg-[#09090b] w-2/3'
 						>
-							<nav className='flex flex-col h-full justify-between text-lg font-medium pt-20'>
+							<nav className='flex flex-col h-full justify-between text-lg font-medium pt-10'>
 								<div className='flex flex-col'>
 									<div className='flex items-center gap-2 z-40 ml-2 text-[#FAFAFA] mb-5'>
 										<div className='bg-[#7058d0] flex justify-center items-center font-semibold text-sm text-black h-10 w-10 rounded-md'>
@@ -200,17 +176,17 @@ const DashboardNav = ({ user }: { user: KindeUser | null }) => {
 										<span className=''>Settings</span>
 									</Link>
 								</div>
-								<div>
+								<div className=''>
 									<LogoutLink
 										className={buttonVariants({
 											size: 'nav',
 											variant: 'hero',
 											className:
-												'flex justify-center md:justify-normal text-[#A1A1AA] hover:text-[#FAFAFA] shrink-0 w-full py-2 px-3 rounded-sm items-center gap-2 md:text-base',
+												'flex text-[#A1A1AA] hover:text-[#FAFAFA] shrink-0 py-2 px-3 items-center gap-2 md:text-base',
 										})}
 									>
-										<LogOut className='h-[18px] w-[18px]' />
-										<span className='hidden md:block'>Log out</span>
+										<LogOut className='h-[20px] w-[20px]' />
+										<span className='text-xl'>Log out</span>
 									</LogoutLink>
 								</div>
 							</nav>

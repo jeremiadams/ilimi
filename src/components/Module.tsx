@@ -69,7 +69,7 @@ const Module: FC<ModuleProps> = ({
 							<div className='hidden sm:flex h-12 shrink-0 bg-[#7058d0] px-4 text-black rounded-md font-medium justify-center items-center'>
 								<span>{`Module ${index + 1}`}</span>
 							</div>
-							<span className=' font-semibold text-lg sm:text-xl line-clamp-2'>
+							<span className='text-left font-semibold text-lg sm:text-xl line-clamp-2'>
 								{title}
 							</span>
 						</div>

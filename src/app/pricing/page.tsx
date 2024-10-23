@@ -69,7 +69,7 @@ const Page: FC<PageProps> = async ({}) => {
 	return (
 		<>
 			<Navbar />
-			<MaxWidthWrapper className='mb-12 mt-28 sm:mt-40 max-w-5xl'>
+			<MaxWidthWrapper className='mb-12 mt-20 sm:mt-40 max-w-5xl'>
 				<div className=' mx-auto mb-10 sm:max-w-xl'>
 					<h1 className=' text-6xl sm:text-7xl font-bold text-white'>
 						Upgrade to Pro!

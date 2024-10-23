@@ -15,7 +15,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 	const user = await getUser()
 
 	if (!user || !user.id) {
-		return new Response('Unauthorized', { status: 401 })
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
 	const userDetails = await db.user.findFirst({
@@ -44,6 +44,9 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 			'Error initializing payment:',
 			error.response?.data || error.message
 		)
-		return new Response('Failed to initialize payment', { status: 500 })
+		return NextResponse.json(
+			{ error: 'Failed to generate subscription link' },
+			{ status: 400 }
+		)
 	}
 }

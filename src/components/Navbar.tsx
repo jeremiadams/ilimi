@@ -3,9 +3,11 @@ import { FC, useState, useEffect } from 'react'
 import MaxWidthWrapper from './MaxWidthWrapper'
 import Link from 'next/link'
 import { ArrowRightIcon } from '@radix-ui/react-icons'
-import { buttonVariants } from './ui/button'
+import { Button, buttonVariants } from './ui/button'
 import { LoginLink, RegisterLink } from '@kinde-oss/kinde-auth-nextjs'
 import { motion } from 'framer-motion'
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
+import { Menu } from 'lucide-react'
 
 interface NavbarProps {}
 
@@ -167,6 +169,92 @@ const Navbar: FC<NavbarProps> = ({}) => {
 							</motion.div>
 						</>
 					</div>
+
+					<motion.div
+						className='sm:hidden'
+						variants={svgVariants}
+						initial='hidden'
+						animate='visible'
+					>
+						<Sheet>
+							<SheetTrigger asChild>
+								<Button
+									size='icon'
+									variant='hero'
+									className='sm:hidden border-0'
+								>
+									<Menu className='h-6 w-6 text-[#FAFAFA]' />
+									<span className='sr-only'>Toggle Menu</span>
+								</Button>
+							</SheetTrigger>
+							<SheetContent side='top' className='border-0 bg-[#09090b] py-20'>
+								<div className='flex flex-col items-center space-y-2 '>
+									<>
+										<motion.div
+											initial={{ y: 20, opacity: 0 }}
+											animate={{ y: 0, opacity: 1 }}
+											transition={{
+												duration: 1,
+												ease: 'easeInOut',
+											}}
+										>
+											<Link
+												href='/pricing'
+												className={buttonVariants({
+													size: 'hero',
+													variant: 'hero',
+													className:
+														'bg-transparent text-white hover:text-[#9a7eb2]',
+												})}
+											>
+												Pricing
+											</Link>
+										</motion.div>
+
+										<motion.div
+											initial={{ y: 20, opacity: 0 }}
+											animate={{ y: 0, opacity: 1 }}
+											transition={{
+												duration: 1,
+												ease: 'easeInOut',
+											}}
+										>
+											<LoginLink
+												className={buttonVariants({
+													size: 'nav',
+													variant: 'hero',
+													className:
+														' bg-transparent hover:bg-[#1e1922] text-white mb-2',
+												})}
+											>
+												Sign in
+											</LoginLink>
+										</motion.div>
+
+										<motion.div
+											initial={{ scale: 0 }}
+											animate={{ scale: [0, 1.2, 1] }}
+											transition={{
+												duration: 1,
+												ease: 'easeInOut',
+											}}
+										>
+											<RegisterLink
+												className={buttonVariants({
+													size: 'nav',
+													variant: 'hero',
+													className:
+														' bg-[#1e1922] hover:bg-[#312a37] text-white',
+												})}
+											>
+												Sign up <ArrowRightIcon className='ml-2 h-4 w-4' />
+											</RegisterLink>
+										</motion.div>
+									</>
+								</div>
+							</SheetContent>
+						</Sheet>
+					</motion.div>
 				</div>
 			</MaxWidthWrapper>
 		</nav>

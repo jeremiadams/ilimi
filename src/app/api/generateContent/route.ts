@@ -13,7 +13,7 @@ export const POST = async (req: NextRequest) => {
 	const user = await getUser()
 
 	if (!user || !user.id) {
-		return new Response('Unauthorized', { status: 401 })
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
 	const { moduleId, pathwayId, moduleNumber, moduleTitle } =
@@ -26,7 +26,8 @@ export const POST = async (req: NextRequest) => {
 		},
 	})
 
-	if (!pathway) return new Response('Not found', { status: 404 })
+	if (!pathway)
+		return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
 	const singleModule = await db.module.findFirst({
 		where: {
@@ -131,6 +132,9 @@ export const POST = async (req: NextRequest) => {
 
 		return NextResponse.json('Successfully generated content', { status: 200 })
 	} else {
-		return new Response('Cannot generate pathway', { status: 400 })
+		return NextResponse.json(
+			{ error: 'Cannot generate content' },
+			{ status: 400 }
+		)
 	}
 }

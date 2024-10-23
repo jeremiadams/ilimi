@@ -13,7 +13,7 @@ export const POST = async (req: NextRequest) => {
 	const user = await getUser()
 
 	if (!user || !user.id) {
-		return new Response('Unauthorized', { status: 401 })
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
 	const { pathwayId, pathwayTitle } = GenerateQuizValidator.parse(body)
@@ -25,7 +25,8 @@ export const POST = async (req: NextRequest) => {
 		},
 	})
 
-	if (!pathway) return new Response('Not found', { status: 404 })
+	if (!pathway)
+		return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
 	const prevMessages = await db.message.findMany({
 		where: {
@@ -123,6 +124,9 @@ export const POST = async (req: NextRequest) => {
 
 		return NextResponse.json(quizContent, { status: 200 })
 	} else {
-		return new Response('Error generating quiz', { status: 400 })
+		return NextResponse.json(
+			{ error: 'Error generating quiz' },
+			{ status: 400 }
+		)
 	}
 }

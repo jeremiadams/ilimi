@@ -4,6 +4,7 @@ import { openai } from '@/lib/openai'
 import { getUserSubscriptionPlan } from '@/lib/paystack'
 import { SendMessageValidator } from '@/lib/validators/SendMessageValidator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
+import { error } from 'console'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const maxDuration = 300
@@ -15,29 +16,30 @@ export const POST = async (req: NextRequest) => {
 	const user = await getUser()
 
 	if (!user || !user.id) {
-		return new Response('Unauthorized', { status: 401 })
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
 	const subscriptionPlan = await getUserSubscriptionPlan()
 
 	const pathwaysAmt = await db.pathway.findMany({
 		where: {
-			id: user?.id,
+			userId: user?.id,
 		},
 	})
-
-	console.log(pathwaysAmt)
 
 	const isProExceeded =
 		pathwaysAmt.length > PLANS.find((plan) => plan.name === 'Pro')!?.quota
 	const isFreeExceeded =
 		pathwaysAmt.length > PLANS.find((plan) => plan.name === 'Free')!?.quota
 
-	if (
-		(subscriptionPlan.isSubscribed && isProExceeded) ||
-		(!subscriptionPlan.isSubscribed && isFreeExceeded)
-	) {
-		return new Response('Maximum amount of pathways generated', { status: 403 })
+	if (!subscriptionPlan.isSubscribed && isFreeExceeded) {
+		return NextResponse.json(
+			{
+				error:
+					'Maximum amount of pathways generated for your current plan. Upgrade to PRO!',
+			},
+			{ status: 403 }
+		)
 	}
 
 	const { message } = SendMessageValidator.parse(body)
@@ -62,8 +64,10 @@ export const POST = async (req: NextRequest) => {
 			?.toLowerCase()
 			.includes('no')
 	)
-		return new Response(
-			`Cannot generate learning pathway for ${message}. Kindly input something more intuitive.`,
+		return NextResponse.json(
+			{
+				error: `Cannot generate learning pathway for ${message}. Kindly input something more intuitive.`,
+			},
 			{ status: 400 }
 		)
 
@@ -167,8 +171,11 @@ export const POST = async (req: NextRequest) => {
 			],
 		})
 
-		return NextResponse.json({ pathway }, { status: 200 })
+		return NextResponse.json({ pathwaysAmt }, { status: 200 })
 	} else {
-		return new Response('Cannot generate pathway', { status: 400 })
+		return NextResponse.json(
+			{ error: 'Cannot generate pathway' },
+			{ status: 400 }
+		)
 	}
 }

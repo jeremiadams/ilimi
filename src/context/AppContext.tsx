@@ -53,8 +53,10 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 			})
 
 			if (!response.ok) {
+				const errorData = await response.json()
 				throw new Error(
-					`Cannot generate learning pathway for ${message}. Kindly input something more intuitive or try again later.`
+					// `Cannot generate learning pathway for ${message}. Kindly input something more intuitive or try again later.`
+					errorData.error
 				)
 			}
 
