@@ -137,10 +137,20 @@ const DashboardNav = ({ user }: { user: KindeUser | null }) => {
 							<nav className='flex flex-col h-full justify-between text-lg font-medium pt-10'>
 								<div className='flex flex-col'>
 									<div className='flex items-center gap-2 z-40 ml-2 text-[#FAFAFA] mb-5'>
-										<div className='bg-[#7058d0] flex justify-center items-center font-semibold text-sm text-black h-10 w-10 rounded-md'>
-											<span>J</span>
+										<div className='bg-[#7058d0] flex justify-center uppercase items-center font-semibold text-sm text-black h-10 w-10 rounded-md'>
+											{user?.given_name
+												? user?.given_name.charAt(0).toUpperCase()
+												: user?.family_name
+												? user?.family_name.charAt(0).toUpperCase()
+												: 'YA'}
 										</div>
-										<span className='font-medium text-[#FAFAFA]'>Jeremiah</span>
+										<span className='hidden md:block font-medium capitalize text-[#FAFAFA]'>
+											{user?.given_name
+												? user?.given_name
+												: user?.family_name
+												? user?.family_name
+												: 'Your Account'}
+										</span>
 									</div>
 									<Link
 										href='/dashboard'
@@ -194,9 +204,6 @@ const DashboardNav = ({ user }: { user: KindeUser | null }) => {
 					</Sheet>
 				</header>
 			</div>
-			{/* <main className='max-[639px]:ml-0 min-[640px]:ml-20 md:ml-60 w-full h-[calc(100vh-4rem)] sm:h-auto p-5 sm:p-10 bg-[#151518]'>
-					{children}
-				</main> */}
 		</TooltipProvider>
 	)
 }
