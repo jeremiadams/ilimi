@@ -18,6 +18,8 @@ interface AppContextProps {
 	message: string
 	handleInputChange: (event: ChangeEvent<HTMLInputElement>) => void
 	isLoading: boolean
+	isOpen: boolean
+	setIsOpen: Dispatch<SetStateAction<boolean>>
 	setMessage: Dispatch<SetStateAction<string>>
 }
 
@@ -26,6 +28,8 @@ export const AppContext = createContext<AppContextProps>({
 	message: '',
 	handleInputChange: () => {},
 	isLoading: false,
+	isOpen: false,
+	setIsOpen: () => {},
 	setMessage: () => {},
 })
 
@@ -38,6 +42,7 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 }) => {
 	const [message, setMessage] = useState<string>('')
 	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [isOpen, setIsOpen] = useState<boolean>(false)
 
 	const { toast } = useToast()
 
@@ -54,25 +59,27 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 
 			if (!response.ok) {
 				const errorData = await response.json()
-				throw new Error(
-					// `Cannot generate learning pathway for ${message}. Kindly input something more intuitive or try again later.`
-					errorData.error
-				)
+				throw new Error(errorData.error)
 			}
 
 			return response.body
 		},
 		onSuccess: () => {
 			setIsLoading(false)
+			setIsOpen(false)
 			queryClient.invalidateQueries()
 		},
 		onMutate: () => {
 			setIsLoading(true)
+			setIsOpen(true)
 		},
 		onSettled: () => {
 			setIsLoading(false)
+			setIsOpen(false)
 		},
 		onError: (error) => {
+			setIsLoading(false)
+			setIsOpen(false)
 			return toast({
 				title: error.message,
 				description: 'Please try again',
@@ -94,6 +101,8 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 				message,
 				handleInputChange,
 				isLoading,
+				isOpen,
+				setIsOpen,
 				setMessage,
 			}}
 		>

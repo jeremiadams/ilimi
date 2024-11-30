@@ -58,7 +58,7 @@ export const POST = async (req: NextRequest) => {
 			{
 				role: 'system',
 				content: `
-					 You are a teacher and your job is to create detailed lecture notes(course content) for any module given by a user. Ensure all concepts are explained in detailed and not just listed out. Include links where necessary. Do not inlude quizzes or exercises at this point.
+					 You are a teacher and your job is to create detailed lecture notes(course content) for any module given by a user. Ensure all concepts are explained in detail and not just listed out. Include links where necessary (functional links not generic or placeholder links). Do not inlude quizzes or exercises at this point.
 					`,
 			},
 			{
@@ -93,6 +93,8 @@ export const POST = async (req: NextRequest) => {
 				},
 			},
 		],
+		temperature: 1,
+		max_tokens: 2048,
 		function_call: { name: 'createContent' },
 	})
 
@@ -130,7 +132,7 @@ export const POST = async (req: NextRequest) => {
 			},
 		})
 
-		return NextResponse.json('Successfully generated content', { status: 200 })
+		return NextResponse.json(response, { status: 200 })
 	} else {
 		return NextResponse.json(
 			{ error: 'Cannot generate content' },

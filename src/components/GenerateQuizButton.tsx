@@ -4,8 +4,10 @@ import { FC, useState } from 'react'
 import { Badge } from './ui/badge'
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogDescription,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
@@ -15,7 +17,7 @@ import { ArrowRight } from 'lucide-react'
 import { QuestionsAndAnswers } from '@/lib/types/QuestionsAndAnswers'
 import Quiz from './Quiz'
 import { nanoid } from 'nanoid'
-import { buttonVariants } from './ui/button'
+import { Button, buttonVariants } from './ui/button'
 
 interface GenerateQuizButtonProps {
 	isLoading: boolean
@@ -125,6 +127,20 @@ const GenerateQuizButton: FC<GenerateQuizButtonProps> = ({
 						</button>
 					)}
 				</div>
+				{!isLoading && (
+					<DialogFooter className='sm:justify-start'>
+						<DialogClose asChild>
+							<Button
+								type='button'
+								size='dashboard'
+								variant='hero'
+								className='h-10 rounded-md px-5 bg-[#212124] hover:bg-[#18181b] text-[#FAFAFA] text-sm'
+							>
+								Close
+							</Button>
+						</DialogClose>
+					</DialogFooter>
+				)}
 			</DialogContent>
 		</Dialog>
 	)

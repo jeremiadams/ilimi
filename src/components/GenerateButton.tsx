@@ -17,19 +17,44 @@ import { Input } from './ui/input'
 import { PlusIcon } from '@radix-ui/react-icons'
 import { AppContext } from '@/context/AppContext'
 import { Loader2 } from 'lucide-react'
+import { Progress } from './ui/progress'
 
 interface GenerateButtonProps {}
 
 const GenerateButton: FC<GenerateButtonProps> = ({}) => {
-	const { createPathway, handleInputChange, isLoading, message, setMessage } =
-		useContext(AppContext)
+	const {
+		createPathway,
+		handleInputChange,
+		isLoading,
+		isOpen,
+		setIsOpen,
+		message,
+		setMessage,
+	} = useContext(AppContext)
 
-	const [isOpen, setIsOpen] = useState<boolean>(false)
-	// const [lockModal, setLockModal] = useState<boolean>(true)
+	const [isGenerating, setIsGenerating] = useState<boolean>(true)
+	const [generateProgress, setGenerateProgress] = useState<number>(0)
+
+	const simulatedProgress = () => {
+		setGenerateProgress(0)
+
+		const interval = setInterval(() => {
+			setGenerateProgress((prevProgress) => {
+				if (prevProgress >= 95) {
+					clearInterval(interval)
+					return prevProgress
+				}
+
+				return prevProgress + 1
+			})
+		}, 500)
+
+		return interval
+	}
 
 	return (
 		<Dialog
-			open={isLoading ? isLoading : isOpen}
+			open={isOpen}
 			onOpenChange={(v) => {
 				if (!v) {
 					setIsOpen(v)
@@ -66,6 +91,7 @@ const GenerateButton: FC<GenerateButtonProps> = ({}) => {
 						<Input
 							id='generate'
 							onChange={handleInputChange}
+							disabled={isLoading}
 							value={message}
 							onKeyDown={(e) => {
 								if (e.key === 'Enter') {
@@ -89,12 +115,20 @@ const GenerateButton: FC<GenerateButtonProps> = ({}) => {
 						})}
 						onClick={() => {
 							createPathway()
+							const progressInterval = simulatedProgress()
+
+							// clearInterval(progressInterval)
 							setMessage('')
 						}}
 					>
 						{isLoading ? <Loader2 className=' animate-spin' /> : 'Generate'}
 					</button>
 				</div>
+				{/* {isLoading ? (
+					<div className=' w-full mt-4 mb-4 mx-auto'>
+						<Progress value={generateProgress} className=' h-1 w-full' />
+					</div>
+				) : null} */}
 				<DialogFooter className='sm:justify-start'>
 					<DialogClose asChild>
 						<Button

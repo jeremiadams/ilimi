@@ -53,7 +53,7 @@ export const POST = async (req: NextRequest) => {
 			},
 			{
 				role: 'user',
-				content: `Generate a quiz with 20 questions for the course: ${pathwayTitle}. Use the following pieces of information (which is in a stringified JSON format ) for context on the course modules for ${pathwayTitle} that have already been generated:
+				content: `Generate a quiz with a maximum of 20 questions for the course: ${pathwayTitle}. Use the following pieces of information (which is in a stringified JSON format ) for context on the course modules for ${pathwayTitle} that have already been generated:
 
 	            \n----------------\n
 

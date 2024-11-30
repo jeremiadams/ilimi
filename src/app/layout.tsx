@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar'
 import Providers from '@/components/Providers'
 import { Toaster } from '@/components/ui/toaster'
 import { AppContextProvider } from '@/context/AppContext'
+import Script from 'next/script'
 
 const inter = Inter({
 	weight: ['400', '500', '600', '700', '800', '900'],
@@ -28,6 +29,21 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
+			<head>
+				<Script
+					async
+					src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
+				></Script>
+				<Script id='google-analytics'>
+					{`
+						window.dataLayer = window.dataLayer || [];
+						function gtag(){dataLayer.push(arguments);}
+						gtag('js', new Date());
+
+						gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');
+					`}
+				</Script>
+			</head>
 			<Providers>
 				<AppContextProvider>
 					<body

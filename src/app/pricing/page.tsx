@@ -14,10 +14,10 @@ import {
 	getKindeServerSession,
 	RegisterLink,
 } from '@kinde-oss/kinde-auth-nextjs/server'
-import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 import UpgradeButton from '@/components/UpgradeButton'
 import { ArrowRightIcon } from '@radix-ui/react-icons'
+import Footer from '@/components/Footer'
 
 interface PageProps {}
 
@@ -182,6 +182,7 @@ const Page: FC<PageProps> = async ({}) => {
 					})}
 				</div>
 			</MaxWidthWrapper>
+			<Footer />
 		</>
 	)
 }
