@@ -32,15 +32,15 @@ export const POST = async (req: NextRequest) => {
 	const isFreeExceeded =
 		pathwaysAmt.length > PLANS.find((plan) => plan.name === 'Free')!?.quota
 
-	// if (!subscriptionPlan.isSubscribed && isFreeExceeded) {
-	// 	return NextResponse.json(
-	// 		{
-	// 			error:
-	// 				'Maximum amount of pathways generated for your current plan. Upgrade to PRO!',
-	// 		},
-	// 		{ status: 403 }
-	// 	)
-	// }
+	if (!subscriptionPlan.isSubscribed && isFreeExceeded) {
+		return NextResponse.json(
+			{
+				error:
+					'Maximum amount of pathways generated for your current plan. Upgrade to PRO!',
+			},
+			{ status: 403 }
+		)
+	}
 
 	const { message } = SendMessageValidator.parse(body)
 

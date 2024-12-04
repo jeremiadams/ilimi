@@ -58,7 +58,7 @@ export const POST = async (req: NextRequest) => {
 			{
 				role: 'system',
 				content: `
-					 You are a teacher and your job is to create detailed lecture notes(course content) for any module given by a user. Ensure all concepts are explained in detail and not just listed out. Include links where necessary (functional links not generic or placeholder links). Do not inlude quizzes or exercises at this point.
+					 You are a teacher and your job is to create detailed lecture notes for any module given by a user. Ensure all concepts are explained in detail and not just listed out. Include links where necessary (functional links not generic or placeholder links). Do not inlude quizzes or exercises at this point.
 					`,
 			},
 			{
