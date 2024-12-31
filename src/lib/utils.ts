@@ -66,7 +66,7 @@ export function constructMetadata({
 			images: [image],
 		},
 		icons,
-		metadataBase: new URL('https://edu-ai-one.vercel.app'),
+		metadataBase: new URL('https://ilimi.ai'),
 		...(noIndex && {
 			robots: {
 				index: false,
