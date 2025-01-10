@@ -5,18 +5,20 @@ import Module from './Module'
 import { useToast } from './ui/use-toast'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { Modules } from '@/lib/types/Modules'
+import { ModulesType } from '@/lib/types/Modules'
 import { AppContext } from '@/context/AppContext'
 import { ArrowRight } from 'lucide-react'
 import GenerateQuizButton from './GenerateQuizButton'
 import { shuffleArray } from '@/lib/utils'
 import { nanoid } from 'nanoid'
 import { QuestionsAndAnswers } from '@/lib/types/QuestionsAndAnswers'
+import { trpc } from '@/app/_trpc/client'
 
 interface OnePathwayProps {
 	title: string
 	description: string
-	modules: Modules[]
+	difficulty: string
+	modules: ModulesType[]
 	id: string
 }
 
@@ -24,6 +26,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 	id,
 	title,
 	description,
+	difficulty,
 	modules,
 }) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -36,23 +39,40 @@ const OnePathway: FC<OnePathwayProps> = ({
 	const [score, setScore] = useState<number>(0)
 	const [mark, setMark] = useState<boolean>(false)
 
+	const queryClient = useQueryClient()
+
+	const { mutate: markAsComplete } = trpc.markSectionAsComplete.useMutation({
+		onSuccess: () => {
+			queryClient.invalidateQueries()
+		},
+	})
+
 	const { mutate: generateContent } = useMutation({
 		mutationFn: async ({
 			moduleTitle,
 			moduleNumber,
+			sectionId,
+			sectionTitle,
 			moduleId,
+			difficulty,
 		}: {
 			moduleTitle: string
 			moduleNumber: string
+			sectionId: string
+			sectionTitle: string
 			moduleId: string
+			difficulty: string
 		}) => {
 			const response = await fetch('/api/generateContent', {
 				method: 'POST',
 				body: JSON.stringify({
 					pathwayId: id,
-					moduleId,
-					moduleNumber,
 					moduleTitle,
+					moduleNumber,
+					sectionId,
+					sectionTitle,
+					moduleId,
+					difficulty,
 				}),
 			})
 
@@ -60,12 +80,14 @@ const OnePathway: FC<OnePathwayProps> = ({
 				throw new Error('Failed to send message')
 			}
 
-			return { response: response.body, moduleId }
+			return { response: response.body, sectionId }
 		},
 		onSuccess: (response) => {
 			setIsLoading(false)
 			// queryClient.invalidateQueries()
-			router.push(`/dashboard/pathways/modules/${response.moduleId}`)
+			markAsComplete({ id: response.sectionId })
+			router.push(`/dashboard/pathways/modules/${response.sectionId}`)
+			return response
 		},
 		onMutate: () => {
 			setIsLoading(true)
@@ -190,15 +212,16 @@ const OnePathway: FC<OnePathwayProps> = ({
 				</div>
 			</div>
 			<div className='pt-10 flex flex-col gap-5'>
-				{modules.map((item, ind) => (
+				{modules.map((item: any, ind: any) => (
 					<Module
 						id={item.id}
 						key={item.id}
 						index={ind}
 						title={item.title}
-						pathwayStatus={item.pathwayStatus}
 						isLoading={isLoading}
 						generateContent={generateContent}
+						sections={item.Section}
+						difficulty={difficulty}
 					/>
 				))}
 			</div>

@@ -3,8 +3,14 @@ import { openai } from '@/lib/openai'
 import { GenerateContentValidator } from '@/lib/validators/GenerateContentValidator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { zodResponseFormat } from 'openai/helpers/zod'
 
 export const maxDuration = 300
+
+const CourseContent = z.object({
+	content: z.string(),
+})
 
 export const POST = async (req: NextRequest) => {
 	const body = await req.json()
@@ -16,8 +22,15 @@ export const POST = async (req: NextRequest) => {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
-	const { moduleId, pathwayId, moduleNumber, moduleTitle } =
-		GenerateContentValidator.parse(body)
+	const {
+		sectionId,
+		pathwayId,
+		moduleNumber,
+		moduleTitle,
+		sectionTitle,
+		moduleId,
+		difficulty,
+	} = GenerateContentValidator.parse(body)
 
 	const pathway = await db.pathway.findFirst({
 		where: {
@@ -35,7 +48,16 @@ export const POST = async (req: NextRequest) => {
 		},
 	})
 
-	if (singleModule?.content)
+	if (!singleModule)
+		return NextResponse.json({ error: 'Module Not found' }, { status: 404 })
+
+	const singleSection = await db.section.findFirst({
+		where: {
+			id: sectionId,
+		},
+	})
+
+	if (singleSection?.content)
 		return NextResponse.json('Successfully fetched content', { status: 200 })
 
 	const prevMessages = await db.message.findMany({
@@ -48,95 +70,242 @@ export const POST = async (req: NextRequest) => {
 	})
 
 	const formattedPrevMessages = prevMessages.map((msg) => ({
-		role: msg.isUserMessage ? ('user' as const) : ('assistant' as const),
-		content: msg.text,
+		role:
+			msg.role === 'USER'
+				? ('user' as const)
+				: msg.role === 'ASSISTANT'
+				? ('assistant' as const)
+				: ('system' as const),
+		content: msg.content,
 	}))
 
-	let response = await openai.chat.completions.create({
-		model: 'gpt-4-turbo',
-		messages: [
-			{
-				role: 'system',
-				content: `
-					 You are a teacher and your job is to create detailed lecture notes for any module given by a user. Ensure all concepts are explained in detail and not just listed out. Include links where necessary (functional links not generic or placeholder links). Do not inlude quizzes or exercises at this point.
-					`,
-			},
-			{
-				role: 'user',
-				content: `Create a course content for module ${moduleNumber}: ${moduleTitle} strictly in markdown format. Use the following pieces of information (which is in a stringified JSON format ) for context on past messages:
+	const newMessages = [...formattedPrevMessages]
 
-                \n----------------\n
-
-                CONTEXT: 
-                ${formattedPrevMessages.map((message) => {
-									if (message.role === 'user')
-										return `User: ${message.content}\n`
-									return `Assistant: ${message.content}\n`
-								})}
-                `,
-			},
-		],
-		functions: [
-			{
-				name: 'createContent',
-				description: 'Create course content for a module ',
-				parameters: {
-					type: 'object',
-					properties: {
-						courseContent: {
-							type: 'string',
-							description:
-								'The detailed course content of a module, strictly in markdown format',
-						},
-					},
-					required: ['courseContent'],
-				},
-			},
-		],
-		temperature: 1,
-		max_tokens: 2048,
-		function_call: { name: 'createContent' },
-	})
-
-	if (
-		typeof response.choices[0].message.function_call?.arguments === 'string' &&
-		typeof JSON.parse(response.choices[0].message.function_call?.arguments) ===
-			'object'
-	) {
-		const courseContentObj = JSON.parse(
-			response.choices[0].message.function_call?.arguments
-		)
-
-		await db.module.update({
-			where: {
-				id: moduleId,
-			},
-			data: {
-				content: courseContentObj.courseContent,
-				pathwayStatus: 'PENDING',
-			},
+	// Refinement Functions
+	const generateInitialContent = async () => {
+		const prompt = `Write an introduction to the topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}" ${
+			difficulty !== 'No Preference' ? `suitable for ${difficulty}` : '.'
+		} Include examples and real-world applications.`
+		newMessages.push({
+			role: 'user',
+			content: prompt,
+		})
+		const response = await openai.beta.chat.completions.parse({
+			model: 'gpt-4o',
+			messages: newMessages,
+			// max_tokens: 500,
+			response_format: zodResponseFormat(CourseContent, 'content'),
 		})
 
-		await db.message.create({
-			data: {
-				text:
-					typeof response.choices[0].message.function_call?.arguments ===
-					'string'
-						? response.choices[0].message.function_call?.arguments
-						: JSON.stringify(
-								response.choices[0].message.function_call?.arguments
-						  ),
-				isUserMessage: true,
-				pathwayId,
-				userId: user.id,
-			},
-		})
-
-		return NextResponse.json(response, { status: 200 })
-	} else {
-		return NextResponse.json(
-			{ error: 'Cannot generate content' },
-			{ status: 400 }
-		)
+		const course_content = response.choices[0].message
+		if (course_content.refusal) {
+			return NextResponse.json(
+				{ error: course_content.refusal },
+				{ status: 400 }
+			)
+		} else {
+			return course_content.parsed?.content
+		}
 	}
+
+	const refineContent = async (draft: any) => {
+		const prompt = `The following draft was written about topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}" ${
+			difficulty !== 'No Preference' ? `for ${difficulty}` : ':'
+		}
+		${draft}
+		Expand on the draft with more examples, detailed explanations, and applications. Address potential misconceptions if any.`
+		newMessages.push({
+			role: 'user',
+			content: prompt,
+		})
+		const response = await openai.beta.chat.completions.parse({
+			model: 'gpt-4o',
+			messages: newMessages,
+			// max_tokens: 500,
+			response_format: zodResponseFormat(CourseContent, 'content'),
+		})
+
+		const course_content = response.choices[0].message
+		if (course_content.refusal) {
+			return NextResponse.json(
+				{ error: course_content.refusal },
+				{ status: 400 }
+			)
+		} else {
+			return course_content.parsed?.content
+		}
+	}
+
+	const evaluateContent = async (content: any) => {
+		const prompt = `Review the following content about topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}":
+		${content}
+		Identify if there's any missing key points, improvements, and unclear sections. Add that to the content and give me a final draft strictly in markdown format. Theres no need to start the draft by labelling it final draft and theres no need to give me back the module name and section title again, just go straight ahead into the content of the course. `
+		newMessages.push({
+			role: 'user',
+			content: prompt,
+		})
+		const response = await openai.beta.chat.completions.parse({
+			model: 'gpt-4o',
+			messages: newMessages,
+			// max_tokens: 700,
+			response_format: zodResponseFormat(CourseContent, 'content'),
+		})
+
+		const course_content = response.choices[0].message
+		if (course_content.refusal) {
+			return NextResponse.json(
+				{ error: course_content.refusal },
+				{ status: 400 }
+			)
+		} else {
+			return course_content.parsed?.content
+		}
+	}
+
+	const refineContentLoop = async () => {
+		const initialContent = await generateInitialContent()
+		const refinedContent = await refineContent(initialContent)
+		const evaluatedContent = await evaluateContent(refinedContent)
+
+		// for (let i = 0; i < iterations; i++) {
+		// 	const feedback = await evaluateContent(content, topic)
+		// 	content = await refineContent(content, topic, audience)
+		// }
+		return evaluatedContent
+	}
+
+	try {
+		// Refinement logic
+		const content = await refineContentLoop()
+
+		// Send response back to the frontend
+		if (typeof content === 'string') {
+			await db.section.update({
+				where: {
+					id: sectionId,
+					moduleId,
+				},
+				data: {
+					content: content,
+					pathwayStatus: 'PENDING',
+				},
+			})
+
+			await db.message.createMany({
+				data: [
+					...newMessages.map((item) => {
+						return {
+							role:
+								item.role === 'user'
+									? ('USER' as const)
+									: item.role === 'assistant'
+									? ('ASSISTANT' as const)
+									: ('SYSTEM' as const),
+							content: item.content,
+							sectionId,
+							userId: user.id,
+						}
+					}),
+					{
+						role: 'ASSISTANT',
+						content: content,
+						sectionId,
+						userId: user.id,
+					},
+				],
+			})
+			return NextResponse.json({ content }, { status: 200 })
+		}
+	} catch (error) {
+		console.error(error)
+		return NextResponse.json('Error generating content', { status: 500 })
+	}
+
+	// let response = await openai.chat.completions.create({
+	// 	model: 'gpt-4-turbo',
+	// 	messages: [
+	// 		{
+	// 			role: 'system',
+	// 			content: `
+	// 				 You are a teacher and your job is to create detailed lecture notes for any module given by a user. Ensure all concepts are explained in detail and not just listed out. Include links where necessary (functional links not generic or placeholder links). Do not inlude quizzes or exercises at this point.
+	// 				`,
+	// 		},
+	// 		{
+	// 			role: 'user',
+	// 			content: `Create a course content for module ${moduleNumber}: ${moduleTitle} strictly in markdown format. Use the following pieces of information (which is in a stringified JSON format ) for context on past messages:
+
+	//             \n----------------\n
+
+	//             CONTEXT:
+	//             ${formattedPrevMessages.map((message) => {
+	// 								if (message.role === 'user')
+	// 									return `User: ${message.content}\n`
+	// 								return `Assistant: ${message.content}\n`
+	// 							})}
+	//             `,
+	// 		},
+	// 	],
+	// 	functions: [
+	// 		{
+	// 			name: 'createContent',
+	// 			description: 'Create course content for a module ',
+	// 			parameters: {
+	// 				type: 'object',
+	// 				properties: {
+	// 					courseContent: {
+	// 						type: 'string',
+	// 						description:
+	// 							'The detailed course content of a module, strictly in markdown format',
+	// 					},
+	// 				},
+	// 				required: ['courseContent'],
+	// 			},
+	// 		},
+	// 	],
+	// 	temperature: 1,
+	// 	max_tokens: 2048,
+	// 	function_call: { name: 'createContent' },
+	// })
+
+	// if (
+	// 	typeof response.choices[0].message.function_call?.arguments === 'string' &&
+	// 	typeof JSON.parse(response.choices[0].message.function_call?.arguments) ===
+	// 		'object'
+	// ) {
+	// 	const courseContentObj = JSON.parse(
+	// 		response.choices[0].message.function_call?.arguments
+	// 	)
+
+	// 	await db.module.update({
+	// 		where: {
+	// 			id: moduleId,
+	// 		},
+	// 		data: {
+	// 			content: courseContentObj.courseContent,
+	// 			pathwayStatus: 'PENDING',
+	// 		},
+	// 	})
+
+	// 	await db.message.create({
+	// 		data: {
+	// 			text:
+	// 				typeof response.choices[0].message.function_call?.arguments ===
+	// 				'string'
+	// 					? response.choices[0].message.function_call?.arguments
+	// 					: JSON.stringify(
+	// 							response.choices[0].message.function_call?.arguments
+	// 					  ),
+	// 			isUserMessage: true,
+	// 			pathwayId,
+	// 			userId: user.id,
+	// 		},
+	// 	})
+
+	// 	return NextResponse.json(response, { status: 200 })
+	// } else {
+	// 	return NextResponse.json(
+	// 		{ error: 'Cannot generate content' },
+	// 		{ status: 400 }
+	// 	)
+	// }
 }

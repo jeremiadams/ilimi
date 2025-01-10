@@ -10,11 +10,12 @@ import ModuleNavBtns from './ModuleNavBtns'
 interface OneModuleProps {
 	id: string
 	title: string | null
-	description: string | null
+	// description: string | null
 	content: string | null
-	pathwayId: string | null
-	firstModuleId: string | undefined
-	lastModuleId: string | undefined
+	moduleId: string | null
+	pathwayId: string | null | undefined
+	firstSectionId: string | undefined
+	lastSectionId: string | undefined
 	prevPageId: string
 	nextPageId: string
 }
@@ -22,18 +23,19 @@ interface OneModuleProps {
 const OneModule: FC<OneModuleProps> = async ({
 	id,
 	title,
-	description,
+	// description,
 	content,
+	moduleId,
 	pathwayId,
-	firstModuleId,
-	lastModuleId,
+	firstSectionId,
+	lastSectionId,
 	prevPageId,
 	nextPageId,
 }) => {
-	const nextModule = await db.module.findFirst({
+	const nextSection = await db.section.findFirst({
 		where: {
 			id: nextPageId,
-			pathwayId,
+			moduleId,
 		},
 	})
 
@@ -42,7 +44,7 @@ const OneModule: FC<OneModuleProps> = async ({
 			<div className='pb-10 border-b border-[#27272A]'>
 				<div className=' max-w-[850px]'>
 					<h1 className='font-medium text-4xl capitalize'>{title}</h1>
-					<p className='pt-4'>{description}</p>
+					{/* <p className='pt-4'>{description}</p> */}
 				</div>
 			</div>
 			<div className='pt-10'>
@@ -55,12 +57,13 @@ const OneModule: FC<OneModuleProps> = async ({
 				</ReactMarkdown>
 				<ModuleNavBtns
 					id={id}
+					moduleId={moduleId}
 					pathwayId={pathwayId}
-					firstModuleId={firstModuleId}
-					lastModuleId={lastModuleId}
+					firstSectionId={firstSectionId}
+					lastSectionId={lastSectionId}
 					prevPageId={prevPageId}
 					nextPageId={nextPageId}
-					nextModuleContent={nextModule?.content ? true : false}
+					nextModuleContent={nextSection?.content ? true : false}
 				/>
 			</div>
 		</>

@@ -1,6 +1,6 @@
 'use client'
 
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { buttonVariants } from './ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -9,9 +9,10 @@ import { trpc } from '@/app/_trpc/client'
 
 interface ModuleNavBtnsProps {
 	id: string
-	pathwayId: string | null
-	firstModuleId: string | undefined
-	lastModuleId: string | undefined
+	moduleId: string | null
+	pathwayId: string | null | undefined
+	firstSectionId: string | undefined
+	lastSectionId: string | undefined
 	prevPageId: string
 	nextPageId: string
 	nextModuleContent: boolean
@@ -19,9 +20,10 @@ interface ModuleNavBtnsProps {
 
 const ModuleNavBtns: FC<ModuleNavBtnsProps> = ({
 	id,
+	moduleId,
 	pathwayId,
-	firstModuleId,
-	lastModuleId,
+	firstSectionId,
+	lastSectionId,
 	prevPageId,
 	nextPageId,
 	nextModuleContent,
@@ -30,7 +32,9 @@ const ModuleNavBtns: FC<ModuleNavBtnsProps> = ({
 
 	const queryClient = useQueryClient()
 
-	const { mutate } = trpc.markModuleAsComplete.useMutation({
+	const [loading, setLoading] = useState<boolean>(false)
+
+	const { mutate } = trpc.markSectionAsComplete.useMutation({
 		onSuccess: () => {
 			queryClient.invalidateQueries()
 		},
@@ -50,8 +54,8 @@ const ModuleNavBtns: FC<ModuleNavBtnsProps> = ({
 						' text-[#fafafab9] hover:text-[#FAFAFA] disabled:cursor-default',
 				})}
 				onClick={() => {
-					handleMarkAsCompleted()
-					if (firstModuleId === id) {
+					// handleMarkAsCompleted()
+					if (firstSectionId === id) {
 						router.push(`/dashboard/pathways/${pathwayId}`)
 						return
 					}
@@ -69,9 +73,9 @@ const ModuleNavBtns: FC<ModuleNavBtnsProps> = ({
 					className: ' text-[#fafafab9] hover:text-[#FAFAFA]',
 				})}
 				onClick={() => {
-					handleMarkAsCompleted()
+					// handleMarkAsCompleted()
 
-					if (lastModuleId === id) {
+					if (lastSectionId === id) {
 						router.push(`/dashboard/pathways/${pathwayId}`)
 						return
 					}
@@ -83,7 +87,6 @@ const ModuleNavBtns: FC<ModuleNavBtnsProps> = ({
 						router.push(`/dashboard/pathways/${pathwayId}`)
 					}
 				}}
-				// disabled={isLoading}
 			>
 				Next
 				<ChevronRight className='ml-2 h-4 w-4 ' />

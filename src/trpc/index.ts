@@ -78,7 +78,7 @@ export const appRouter = router({
 				},
 			})
 		}),
-	markModuleAsComplete: privateProcedure
+	markSectionAsComplete: privateProcedure
 		.input(
 			z.object({
 				id: z.string(),
@@ -88,7 +88,7 @@ export const appRouter = router({
 			const { userId, user } = ctx
 			const { id } = input
 
-			return await db.module.update({
+			return await db.section.update({
 				where: {
 					id,
 				},

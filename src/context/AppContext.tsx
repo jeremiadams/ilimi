@@ -1,7 +1,6 @@
 'use client'
 
 import { useToast } from '@/components/ui/use-toast'
-import { Modules } from '@/lib/types/Modules'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
 	ChangeEvent,
@@ -21,6 +20,8 @@ interface AppContextProps {
 	isOpen: boolean
 	setIsOpen: Dispatch<SetStateAction<boolean>>
 	setMessage: Dispatch<SetStateAction<string>>
+	difficulty: string
+	setDifficulty: Dispatch<SetStateAction<string>>
 }
 
 export const AppContext = createContext<AppContextProps>({
@@ -31,6 +32,8 @@ export const AppContext = createContext<AppContextProps>({
 	isOpen: false,
 	setIsOpen: () => {},
 	setMessage: () => {},
+	difficulty: '',
+	setDifficulty: () => {},
 })
 
 interface AppContextProviderProps {
@@ -41,6 +44,7 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 	children,
 }) => {
 	const [message, setMessage] = useState<string>('')
+	const [difficulty, setDifficulty] = useState<string>('beginnerToIntermediate')
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [isOpen, setIsOpen] = useState<boolean>(false)
 
@@ -49,11 +53,18 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 	const queryClient = useQueryClient()
 
 	const { mutate: sendMessage } = useMutation({
-		mutationFn: async ({ message }: { message: string }) => {
+		mutationFn: async ({
+			message,
+			difficulty,
+		}: {
+			message: string
+			difficulty: string
+		}) => {
 			const response = await fetch('/api/createPathway', {
 				method: 'POST',
 				body: JSON.stringify({
 					message,
+					difficulty,
 				}),
 			})
 
@@ -88,7 +99,7 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 		},
 	})
 
-	const createPathway = () => sendMessage({ message })
+	const createPathway = () => sendMessage({ message, difficulty })
 
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setMessage(e.target.value)
@@ -104,6 +115,8 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 				isOpen,
 				setIsOpen,
 				setMessage,
+				difficulty,
+				setDifficulty,
 			}}
 		>
 			{children}

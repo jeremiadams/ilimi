@@ -33,10 +33,17 @@ enum PathwayStatus {
   COMPLETED
 }
 
+enum MessageRoles {
+  USER
+  SYSTEM
+  ASSISTANT
+}
+
 model Pathway {
   id            String        @id @default(cuid())
   title         String
   description   String
+  difficulty    String
   pathwayStatus PathwayStatus @default(NOT_STARTED)
 
   createdAt DateTime @default(now())
@@ -56,15 +63,30 @@ model Module {
 
   pathwayStatus PathwayStatus @default(NOT_STARTED)
 
+  Section Section[]
+
   Pathway   Pathway? @relation(fields: [pathwayId], references: [id])
   pathwayId String?
 }
 
-model Message {
-  id   String @id @default(cuid())
-  text String @db.Text()
+model Section {
+  id      String  @id @default(cuid())
+  title   String? @db.Text()
+  content String? @db.Text()
 
-  isUserMessage Boolean
+  pathwayStatus PathwayStatus @default(NOT_STARTED)
+
+  Message Message[]
+
+  Module   Module? @relation(fields: [moduleId], references: [id])
+  moduleId String?
+}
+
+model Message {
+  id String @id @default(cuid())
+
+  role    MessageRoles @default(USER)
+  content String       @db.Text()
 
   createdAt DateTime @default(now())
 
@@ -72,4 +94,6 @@ model Message {
   userId    String?
   Pathway   Pathway? @relation(fields: [pathwayId], references: [id])
   pathwayId String?
+  Section   Section? @relation(fields: [sectionId], references: [id])
+  sectionId String?
 }
