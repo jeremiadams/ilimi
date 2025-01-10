@@ -27,11 +27,26 @@ const Page: FC<PageProps> = async ({ params }) => {
 		select: {
 			title: true,
 			description: true,
+			difficulty: true,
 			Module: {
 				select: {
 					id: true,
 					title: true,
 					pathwayStatus: true,
+					Section: {
+						select: {
+							id: true,
+							title: true,
+							content: true,
+							pathwayStatus: true,
+							moduleId: true,
+						},
+						orderBy: [
+							{
+								id: 'asc',
+							},
+						],
+					},
 				},
 				orderBy: [
 					{
@@ -49,6 +64,7 @@ const Page: FC<PageProps> = async ({ params }) => {
 			id={slug}
 			title={pathway.title}
 			description={pathway.description}
+			difficulty={pathway.difficulty}
 			modules={pathway.Module}
 		/>
 	)

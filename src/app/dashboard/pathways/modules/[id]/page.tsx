@@ -19,17 +19,23 @@ const Page: FC<PageProps> = async ({ params }) => {
 	if (!user || !user.id)
 		redirect(`/auth-callback?origin=dashboard/pathways/modules/${id}`)
 
-	const singleModule = await db.module.findFirst({
+	const singleSection = await db.section.findFirst({
 		where: {
 			id: id,
 		},
 	})
 
-	if (!singleModule) notFound()
+	if (!singleSection) notFound()
 
-	const firstQuery = await db.module.findFirst({
+	const moduleForSection = await db.module.findFirst({
 		where: {
-			pathwayId: singleModule.pathwayId,
+			id: singleSection.moduleId!,
+		},
+	})
+
+	const firstQuery = await db.section.findFirst({
+		where: {
+			moduleId: singleSection.moduleId,
 		},
 		orderBy: {
 			id: 'asc',
@@ -39,9 +45,9 @@ const Page: FC<PageProps> = async ({ params }) => {
 		},
 	})
 
-	const lastQuery = await db.module.findFirst({
+	const lastQuery = await db.section.findFirst({
 		where: {
-			pathwayId: singleModule.pathwayId,
+			moduleId: singleSection.moduleId,
 		},
 		orderBy: {
 			id: 'desc',
@@ -51,7 +57,7 @@ const Page: FC<PageProps> = async ({ params }) => {
 		},
 	})
 
-	const prevQuery = await db.module.findMany({
+	const prevQuery = await db.section.findMany({
 		take: -1,
 		skip: 1,
 		cursor: {
@@ -62,7 +68,7 @@ const Page: FC<PageProps> = async ({ params }) => {
 		},
 	})
 
-	const nextQuery = await db.module.findMany({
+	const nextQuery = await db.section.findMany({
 		take: 1,
 		skip: 1,
 		cursor: {
@@ -76,12 +82,13 @@ const Page: FC<PageProps> = async ({ params }) => {
 	return (
 		<OneModule
 			id={id}
-			title={singleModule.title}
-			description={singleModule.description}
-			content={singleModule.content}
-			pathwayId={singleModule.pathwayId}
-			firstModuleId={firstQuery?.id}
-			lastModuleId={lastQuery?.id}
+			title={singleSection.title}
+			// description={singleModule.description}
+			content={singleSection.content}
+			pathwayId={moduleForSection?.pathwayId}
+			moduleId={singleSection.moduleId}
+			firstSectionId={firstQuery?.id}
+			lastSectionId={lastQuery?.id}
 			prevPageId={prevQuery[0]?.id}
 			nextPageId={nextQuery[0]?.id}
 		/>

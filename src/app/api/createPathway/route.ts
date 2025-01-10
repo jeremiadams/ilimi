@@ -4,10 +4,26 @@ import { openai } from '@/lib/openai'
 import { getUserSubscriptionPlan } from '@/lib/paystack'
 import { SendMessageValidator } from '@/lib/validators/SendMessageValidator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
-import { error } from 'console'
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { zodResponseFormat } from 'openai/helpers/zod'
+import { title } from 'process'
 
 export const maxDuration = 300
+
+const Section = z.string()
+
+const Module = z.object({
+	title: z.string(),
+	description: z.string(),
+	sections: z.array(Section),
+})
+
+const CourseOutline = z.object({
+	title: z.string(),
+	description: z.string(),
+	modules: z.array(Module),
+})
 
 export const POST = async (req: NextRequest) => {
 	const body = await req.json()
@@ -32,17 +48,17 @@ export const POST = async (req: NextRequest) => {
 	const isFreeExceeded =
 		pathwaysAmt.length > PLANS.find((plan) => plan.name === 'Free')!?.quota
 
-	if (!subscriptionPlan.isSubscribed && isFreeExceeded) {
-		return NextResponse.json(
-			{
-				error:
-					'Maximum amount of pathways generated for your current plan. Upgrade to PRO!',
-			},
-			{ status: 403 }
-		)
-	}
+	// if (!subscriptionPlan.isSubscribed && isFreeExceeded) {
+	// 	return NextResponse.json(
+	// 		{
+	// 			error:
+	// 				'Maximum amount of pathways generated for your current plan. Upgrade to PRO!',
+	// 		},
+	// 		{ status: 403 }
+	// 	)
+	// }
 
-	const { message } = SendMessageValidator.parse(body)
+	const { message, difficulty } = SendMessageValidator.parse(body)
 
 	let validateMessageFromOpenAI = await openai.chat.completions.create({
 		model: 'gpt-4-turbo',
@@ -71,79 +87,93 @@ export const POST = async (req: NextRequest) => {
 			{ status: 400 }
 		)
 
-	const firstUserMessage = `Create a course outline for ${message}. The course outline should be classified into modules and each module should contain a title and description.`
+	const firstUserMessage = `Create a detailed course outline for the topic "${message}" ${
+		difficulty !== 'No Preference' ? `suitable for ${difficulty}` : '.'
+	} 
+  Divide the course into modules, and sections and ensure the structure covers all necessary concepts. Titles of Modules should not contain the module number. The title of the course outline should be the title of the course.`
 
-	let response = await openai.chat.completions.create({
-		model: 'gpt-4-turbo',
+	const completion = await openai.beta.chat.completions.parse({
+		model: 'gpt-4o',
 		messages: [
-			{
-				role: 'system',
-				content:
-					"You're a teaching assistant and your job is to help users generate courses depending on the user request",
-			},
 			{
 				role: 'user',
 				content: firstUserMessage,
 			},
 		],
-		functions: [
-			{
-				name: 'createCourseOutline',
-				description: 'Create a course outline for the user',
-				parameters: {
-					type: 'object',
-					properties: {
-						title: {
-							type: 'string',
-							description: 'The title of the course the user wants to generate',
-						},
-						description: {
-							type: 'string',
-							description: 'An overview of what the course is about',
-						},
-						modules: {
-							type: 'array',
-							description:
-								'An array of modules in the course outline consisting of objects that have a title and a description for each module',
-							items: {
-								type: 'object',
-								properties: {
-									title: {
-										type: 'string',
-										description:
-											'The title of a module. Just the title text, ensure not to include what module number it is',
-									},
-									description: {
-										type: 'string',
-									},
-								},
-							},
-						},
-					},
-					required: ['title', 'description', 'modules'],
-				},
-			},
-		],
-		function_call: { name: 'createCourseOutline' },
+		response_format: zodResponseFormat(CourseOutline, 'course_outline'),
+		// functions: [
+		// 	{
+		// 		name: 'createCourseOutline',
+		// 		description: 'Create a course outline',
+		// 		parameters: {
+		// 			type: 'object',
+		// 			properties: {
+		// 				title: {
+		// 					type: 'string',
+		// 					description: 'The title of the course the user wants to generate',
+		// 				},
+		// 				description: {
+		// 					type: 'string',
+		// 					description: 'An overview of what the course is about',
+		// 				},
+		// 				modules: {
+		// 					type: 'array',
+		// 					description:
+		// 						'An array of modules in the course outline consisting of objects that have a title and a description for each module',
+		// 					items: {
+		// 						type: 'object',
+		// 						properties: {
+		// 							title: {
+		// 								type: 'string',
+		// 								description:
+		// 									'The title of a module. Just the title text, ensure not to include what module number it is',
+		// 							},
+		// 							description: {
+		// 								type: 'string',
+		// 							},
+		// 							sections: {
+		// 								type: 'array',
+		// 								description: 'sections under a given module',
+		// 								items: {
+		// 									type: 'text',
+		// 								},
+		// 							},
+		// 						},
+		// 					},
+		// 				},
+		// 			},
+		// 			required: ['title', 'description', 'modules'],
+		// 		},
+		// 	},
+		// ],
+		// function_call: { name: 'createCourseOutline' },
 	})
 
-	if (
-		typeof response.choices[0].message.function_call?.arguments === 'string' &&
-		typeof JSON.parse(response.choices[0].message.function_call?.arguments) ===
-			'object'
-	) {
-		const pathwayObj = JSON.parse(
-			response.choices[0].message.function_call?.arguments
-		)
+	const course_outline = completion.choices[0].message
+
+	if (course_outline.refusal) {
+		return NextResponse.json({ error: course_outline.refusal }, { status: 400 })
+	} else {
 		const pathway = await db.pathway.create({
 			data: {
-				title: pathwayObj.title,
-				description: pathwayObj.description,
+				title: course_outline.parsed!.title,
+				description: course_outline.parsed!.description,
+				difficulty: difficulty,
 				userId: user.id,
 				Module: {
-					createMany: {
-						data: pathwayObj?.modules,
-					},
+					create: course_outline.parsed?.modules.map((item) => {
+						return {
+							title: item.title,
+							description: item.title,
+							Section: {
+								create: item.sections.map((item) => {
+									return {
+										title: item,
+									}
+								}),
+							},
+						}
+					}),
 				},
 			},
 		})
@@ -151,31 +181,20 @@ export const POST = async (req: NextRequest) => {
 		await db.message.createMany({
 			data: [
 				{
-					text: firstUserMessage,
-					isUserMessage: true,
+					content: firstUserMessage,
+					role: 'USER',
 					pathwayId: pathway?.id,
 					userId: user.id,
 				},
 				{
-					text:
-						typeof response.choices[0].message.function_call?.arguments ===
-						'string'
-							? response.choices[0].message.function_call?.arguments
-							: JSON.stringify(
-									response.choices[0].message.function_call?.arguments
-							  ),
-					isUserMessage: false,
+					content: JSON.stringify(course_outline.parsed),
+					role: 'ASSISTANT',
 					pathwayId: pathway?.id,
 					userId: user.id,
 				},
 			],
 		})
 
-		return NextResponse.json({ pathwaysAmt }, { status: 200 })
-	} else {
-		return NextResponse.json(
-			{ error: 'Cannot generate pathway' },
-			{ status: 400 }
-		)
+		return NextResponse.json(course_outline.parsed, { status: 200 })
 	}
 }
