@@ -1,21 +1,18 @@
 'use client'
 
-import Link from 'next/link'
 import { FC, useState } from 'react'
 import { Badge } from './ui/badge'
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from './ui/dialog'
 import { Loader2 } from 'lucide-react'
-import Loading from './Loading'
-import { Progress } from './ui/progress'
+import GenerateContentLoadingDialog from './GenerateContentLoadingDialog'
+import { MagicWandIcon } from '@radix-ui/react-icons'
 
 interface SectionProps {
 	id: string
@@ -38,7 +35,12 @@ interface SectionProps {
 		moduleId: string
 		difficulty: string
 	}) => void
+	streamData: { streamId: number; content: string }[]
+	progressFirst: number
+	progressSecond: number
+	progressThird: number
 	isLoading: boolean
+	isRedirecting: boolean
 	difficulty: string
 }
 
@@ -50,30 +52,15 @@ const Section: FC<SectionProps> = ({
 	moduleId,
 	pathwayStatus,
 	generateContent,
+	progressFirst,
+	progressSecond,
+	progressThird,
+	streamData,
 	isLoading,
+	isRedirecting,
 	difficulty,
 }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false)
-
-	const [isGenerating, setIsGenerating] = useState<boolean>(true)
-	const [generateProgress, setGenerateProgress] = useState<number>(0)
-
-	// const simulatedProgress = () => {
-	// 	setGenerateProgress(0)
-
-	// 	const interval = setInterval(() => {
-	// 		setGenerateProgress((prevProgress) => {
-	// 			if (prevProgress >= 95) {
-	// 				clearInterval(interval)
-	// 				return prevProgress
-	// 			}
-
-	// 			return prevProgress + 1
-	// 		})
-	// 	}, 500)
-
-	// 	return interval
-	// }
 
 	return (
 		<Dialog
@@ -95,10 +82,6 @@ const Section: FC<SectionProps> = ({
 							moduleId,
 							difficulty,
 						})
-						// const progressInterval = simulatedProgress()
-
-						// clearInterval(progressInterval)
-						// setGenerateProgress(100)
 					}}
 					disabled={isLoading}
 					className=' cursor-pointer py-3 px-4 sm:py-4 sm:px-6 block transition-all max-w-[850px] bg-[#09090b] border border-[#27272A] hover:border-transparent hover:bg-[#000] hover:shadow-[0px_5px_8px_5px_#121216] duration-500 rounded-lg'
@@ -124,23 +107,44 @@ const Section: FC<SectionProps> = ({
 					</div>
 				</button>
 			</DialogTrigger>
-			<DialogContent className='sm:max-w-lg border-[#27272A]'>
+			<DialogContent
+				aria-describedby='generating content progress bar and loaders'
+				className='sm:max-w-lg border-[#27272A]'
+			>
 				<DialogHeader>
-					<DialogTitle className='text-lg pt-5 pb-2'>
-						<div className=' text-xl flex justify-center items-center'>
-							<Loading />
-						</div>
-					</DialogTitle>
-					<DialogDescription className='text-[#FAFAFA] text-center pb-5'>
-						<span className=' text-xl font-semibold'>
-							Fetching module content...
-						</span>
-					</DialogDescription>
-					{/* {isLoading ? (
-						<div className=' w-full mt-4 mb-4 mx-auto'>
-							<Progress value={generateProgress} className=' h-1 w-full' />
-						</div>
-					) : null} */}
+					{streamData.length === 0 ? (
+						<DialogTitle className='text-lg pt-5 pb-2'>
+							<div className=' text-xl flex justify-center items-center'>
+								<div className='flex flex-col items-center'>
+									<Loader2 className=' w-8 h-8 text-[#e389ba] animate-spin' />
+									<span className=' text-lg text-[#FAFAFA]'>Loading...</span>
+								</div>
+							</div>
+						</DialogTitle>
+					) : (
+						<DialogDescription className='flex flex-col gap-4 item py-5'>
+							<div className='text-[#FAFAFA] flex items-center gap-4 p-5 border border-[#27272A] rounded'>
+								<div>
+									<MagicWandIcon className='w-5 h-5' />
+								</div>
+								<div className=' flex flex-col'>
+									<span className=' font-semibold line-clamp-2'>
+										Generating content for: {title}
+									</span>
+									<span className=' text-sm '>{streamData[0]?.content}</span>
+								</div>
+							</div>
+							<div className=' pl-5'>
+								<GenerateContentLoadingDialog
+									streamData={streamData}
+									progressFirst={progressFirst}
+									progressSecond={progressSecond}
+									progressThird={progressThird}
+									isRedirecting={isRedirecting}
+								/>
+							</div>
+						</DialogDescription>
+					)}
 				</DialogHeader>
 			</DialogContent>
 		</Dialog>

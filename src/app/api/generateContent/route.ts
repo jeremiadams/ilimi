@@ -58,7 +58,10 @@ export const POST = async (req: NextRequest) => {
 	})
 
 	if (singleSection?.content)
-		return NextResponse.json('Successfully fetched content', { status: 200 })
+		return NextResponse.json(
+			{ alreadyGenerated: true, sectionId },
+			{ status: 200 }
+		)
 
 	const prevMessages = await db.message.findMany({
 		where: {
@@ -82,115 +85,143 @@ export const POST = async (req: NextRequest) => {
 	const newMessages = [...formattedPrevMessages]
 
 	// Refinement Functions
-	const generateInitialContent = async () => {
-		const prompt = `Write an introduction to the topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}" ${
-			difficulty !== 'No Preference' ? `suitable for ${difficulty}` : '.'
-		} Include examples and real-world applications.`
-		newMessages.push({
-			role: 'user',
-			content: prompt,
-		})
-		const response = await openai.beta.chat.completions.parse({
-			model: 'gpt-4o',
-			messages: newMessages,
-			// max_tokens: 500,
-			response_format: zodResponseFormat(CourseContent, 'content'),
-		})
+	// const generateInitialContent = async () => {
+	// 	const prompt = `Write an introduction to the topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}" ${
+	// 		difficulty !== 'No Preference' ? `suitable for ${difficulty}` : '.'
+	// 	} Include examples and real-world applications.`
+	// 	newMessages.push({
+	// 		role: 'user',
+	// 		content: prompt,
+	// 	})
+	// 	const response = await openai.beta.chat.completions.parse({
+	// 		model: 'gpt-4o',
+	// 		messages: newMessages,
+	// 		// max_tokens: 500,
+	// 		response_format: zodResponseFormat(CourseContent, 'content'),
+	// 	})
 
-		const course_content = response.choices[0].message
-		if (course_content.refusal) {
-			return NextResponse.json(
-				{ error: course_content.refusal },
-				{ status: 400 }
-			)
-		} else {
-			return course_content.parsed?.content
-		}
-	}
+	// 	const course_content = response.choices[0].message
+	// 	if (course_content.refusal) {
+	// 		return NextResponse.json(
+	// 			{ error: course_content.refusal },
+	// 			{ status: 400 }
+	// 		)
+	// 	} else {
+	// 		return course_content.parsed?.content
+	// 	}
+	// }
 
-	const refineContent = async (draft: any) => {
-		const prompt = `The following draft was written about topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}" ${
-			difficulty !== 'No Preference' ? `for ${difficulty}` : ':'
-		}
-		${draft}
-		Expand on the draft with more examples, detailed explanations, and applications. Address potential misconceptions if any.`
-		newMessages.push({
-			role: 'user',
-			content: prompt,
-		})
-		const response = await openai.beta.chat.completions.parse({
-			model: 'gpt-4o',
-			messages: newMessages,
-			// max_tokens: 500,
-			response_format: zodResponseFormat(CourseContent, 'content'),
-		})
+	// const refineContent = async (draft: any) => {
+	// 	const prompt = `The following draft was written about topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}" ${
+	// 		difficulty !== 'No Preference' ? `for ${difficulty}` : ':'
+	// 	}
+	// 	${draft}
+	// 	Expand on the draft with more examples, detailed explanations, and applications. Address potential misconceptions where necessary.`
+	// 	newMessages.push({
+	// 		role: 'user',
+	// 		content: prompt,
+	// 	})
+	// 	const response = await openai.beta.chat.completions.parse({
+	// 		model: 'gpt-4o',
+	// 		messages: newMessages,
+	// 		// max_tokens: 500,
+	// 		response_format: zodResponseFormat(CourseContent, 'content'),
+	// 	})
 
-		const course_content = response.choices[0].message
-		if (course_content.refusal) {
-			return NextResponse.json(
-				{ error: course_content.refusal },
-				{ status: 400 }
-			)
-		} else {
-			return course_content.parsed?.content
-		}
-	}
+	// 	const course_content = response.choices[0].message
+	// 	if (course_content.refusal) {
+	// 		return NextResponse.json(
+	// 			{ error: course_content.refusal },
+	// 			{ status: 400 }
+	// 		)
+	// 	} else {
+	// 		return course_content.parsed?.content
+	// 	}
+	// }
 
-	const evaluateContent = async (content: any) => {
+	// const evaluateContent = async (content: any) => {
+	// const prompt = `Review the following content about topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}":
+	// ${content}
+	// Identify if there's any missing key points, improvements, and unclear sections. Add that to the content and give me a final draft strictly in markdown format. Theres no need to start the draft by labelling it final draft and theres no need to give me back the module name and section title again, just go straight ahead into the content of the course. `
+	// 	newMessages.push({
+	// 		role: 'user',
+	// 		content: prompt,
+	// 	})
+	// 	const response = await openai.beta.chat.completions.parse({
+	// 		model: 'gpt-4o',
+	// 		messages: newMessages,
+	// 		// max_tokens: 700,
+	// 		response_format: zodResponseFormat(CourseContent, 'content'),
+	// 	})
+
+	// 	const course_content = response.choices[0].message
+	// 	if (course_content.refusal) {
+	// 		return NextResponse.json(
+	// 			{ error: course_content.refusal },
+	// 			{ status: 400 }
+	// 		)
+	// 	} else {
+	// 		return course_content.parsed?.content
+	// 	}
+	// }
+
+	// const refineContentLoop = async () => {
+	// 	const initialContent = await generateInitialContent()
+	// 	const refinedContent = await refineContent(initialContent)
+	// 	const evaluatedContent = await evaluateContent(refinedContent)
+
+	// 	// for (let i = 0; i < iterations; i++) {
+	// 	// 	const feedback = await evaluateContent(content, topic)
+	// 	// 	content = await refineContent(content, topic, audience)
+	// 	// }
+	// 	return evaluatedContent
+	// }
+
+	const evaluateContent = async (
+		input: string,
+		controller: ReadableStreamDefaultController
+	) => {
 		const prompt = `Review the following content about topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}":
-		${content}
-		Identify if there's any missing key points, improvements, and unclear sections. Add that to the content and give me a final draft strictly in markdown format. Theres no need to start the draft by labelling it final draft and theres no need to give me back the module name and section title again, just go straight ahead into the content of the course. `
+			${input}
+			
+			Identify if there's any missing key points, improvements, and unclear sections. Add that to the content and give me a final draft strictly in markdown format. Theres no need to start the draft by labelling it final draft and theres no need to give me back the module name and section title again, just go straight ahead into the content of the course. `
 		newMessages.push({
 			role: 'user',
 			content: prompt,
 		})
-		const response = await openai.beta.chat.completions.parse({
+
+		const stream = openai.beta.chat.completions.stream({
 			model: 'gpt-4o',
 			messages: newMessages,
-			// max_tokens: 700,
+			// max_tokens: 500,
 			response_format: zodResponseFormat(CourseContent, 'content'),
 		})
+		let lastSnapshot = ''
 
-		const course_content = response.choices[0].message
-		if (course_content.refusal) {
-			return NextResponse.json(
-				{ error: course_content.refusal },
-				{ status: 400 }
-			)
-		} else {
-			return course_content.parsed?.content
-		}
-	}
+		stream.on('content.delta', ({ snapshot }) => {
+			// const chunk = JSON.stringify({ content: snapshot })
+			// controller.enqueue(new TextEncoder().encode(`${chunk}\n`))
 
-	const refineContentLoop = async () => {
-		const initialContent = await generateInitialContent()
-		const refinedContent = await refineContent(initialContent)
-		const evaluatedContent = await evaluateContent(refinedContent)
+			const newContent = snapshot.replace(lastSnapshot, '')
+			lastSnapshot = snapshot
 
-		// for (let i = 0; i < iterations; i++) {
-		// 	const feedback = await evaluateContent(content, topic)
-		// 	content = await refineContent(content, topic, audience)
-		// }
-		return evaluatedContent
-	}
+			if (newContent.trim()) {
+				const chunk = JSON.stringify({ streamId: 3, content: newContent })
+				controller.enqueue(new TextEncoder().encode(`${chunk}\n`))
+			}
+		})
 
-	try {
-		// Refinement logic
-		const content = await refineContentLoop()
-
-		// Send response back to the frontend
-		if (typeof content === 'string') {
+		stream.on('content.done', async (props) => {
 			await db.section.update({
 				where: {
 					id: sectionId,
 					moduleId,
 				},
 				data: {
-					content: content,
+					content: props.parsed?.content,
 					pathwayStatus: 'PENDING',
 				},
 			})
-
 			await db.message.createMany({
 				data: [
 					...newMessages.map((item) => {
@@ -208,14 +239,154 @@ export const POST = async (req: NextRequest) => {
 					}),
 					{
 						role: 'ASSISTANT',
-						content: content,
+						content: props.parsed?.content!,
 						sectionId,
 						userId: user.id,
 					},
 				],
 			})
-			return NextResponse.json({ content }, { status: 200 })
+			controller.close() // Close the stream when the second function is done
+		})
+
+		stream.on('error', (err) => {
+			console.error('Second stream error:', err)
+			controller.error(err)
+		})
+	}
+
+	const refineContent = async (
+		input: string,
+		controller: ReadableStreamDefaultController
+	) => {
+		const prompt = `The following draft was written about topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}" ${
+			difficulty !== 'No Preference' ? `for ${difficulty}` : ':'
 		}
+		${input}
+		Expand on the draft with more examples, detailed explanations, and applications. Address potential misconceptions where necessary.`
+		newMessages.push({
+			role: 'user',
+			content: prompt,
+		})
+
+		const stream = openai.beta.chat.completions.stream({
+			model: 'gpt-4o',
+			messages: newMessages,
+			// max_tokens: 500,
+			response_format: zodResponseFormat(CourseContent, 'content'),
+		})
+		let lastSnapshot = ''
+
+		stream.on('content.delta', ({ snapshot }) => {
+			// const chunk = JSON.stringify({ content: snapshot })
+			// controller.enqueue(new TextEncoder().encode(`${chunk}\n`))
+
+			const newContent = snapshot.replace(lastSnapshot, '')
+			lastSnapshot = snapshot
+
+			if (newContent.trim()) {
+				const chunk = JSON.stringify({ streamId: 2, content: newContent })
+				controller.enqueue(new TextEncoder().encode(`${chunk}\n`))
+			}
+		})
+
+		stream.on('content.done', async (props) => {
+			await evaluateContent(props.parsed?.content!, controller)
+		})
+
+		stream.on('error', (err) => {
+			console.error('Second stream error:', err)
+			controller.error(err)
+		})
+	}
+
+	try {
+		// Refinement logic
+		// const content = await refineContentLoop()
+
+		// Send response back to the frontend
+		// if (typeof content === 'string') {
+		// 	await db.section.update({
+		// 		where: {
+		// 			id: sectionId,
+		// 			moduleId,
+		// 		},
+		// 		data: {
+		// 			content: content,
+		// 			pathwayStatus: 'PENDING',
+		// 		},
+		// 	})
+
+		// 	await db.message.createMany({
+		// 		data: [
+		// 			...newMessages.map((item) => {
+		// 				return {
+		// 					role:
+		// 						item.role === 'user'
+		// 							? ('USER' as const)
+		// 							: item.role === 'assistant'
+		// 							? ('ASSISTANT' as const)
+		// 							: ('SYSTEM' as const),
+		// 					content: item.content,
+		// 					sectionId,
+		// 					userId: user.id,
+		// 				}
+		// 			}),
+		// 			{
+		// 				role: 'ASSISTANT',
+		// 				content: content,
+		// 				sectionId,
+		// 				userId: user.id,
+		// 			},
+		// 		],
+		// 	})
+		// 	return NextResponse.json({ content }, { status: 200 })
+		// }
+		const prompt = `Write an introduction to the topic "${sectionTitle}" under module "${moduleNumber}": "${moduleTitle}" ${
+			difficulty !== 'No Preference' ? `suitable for ${difficulty}` : '.'
+		} Include examples and real-world applications.`
+		newMessages.push({
+			role: 'user',
+			content: prompt,
+		})
+
+		const stream = openai.beta.chat.completions.stream({
+			model: 'gpt-4o',
+			messages: newMessages,
+			// max_tokens: 500,
+			response_format: zodResponseFormat(CourseContent, 'content'),
+		})
+
+		const encoder = new TextEncoder()
+		let lastSnapshot = ''
+		const readableStream = new ReadableStream({
+			start(controller) {
+				stream
+					.on('content.delta', ({ snapshot, parsed }) => {
+						const newContent = snapshot.replace(lastSnapshot, '')
+						lastSnapshot = snapshot
+
+						if (newContent.trim()) {
+							const chunk = JSON.stringify({ streamId: 1, content: newContent })
+							controller.enqueue(encoder.encode(`${chunk}\n`))
+						}
+					})
+					.on('content.done', async (props) => {
+						await refineContent(props.parsed?.content!, controller)
+					})
+					.on('error', (err) => {
+						console.error('Stream error:', err)
+						controller.error(err)
+					})
+			},
+		})
+
+		return new NextResponse(readableStream, {
+			headers: {
+				'Content-Type': 'text/event-stream',
+				'Cache-Control': 'no-cache',
+				Connection: 'keep-alive',
+			},
+		})
 	} catch (error) {
 		console.error(error)
 		return NextResponse.json('Error generating content', { status: 500 })
