@@ -5,7 +5,6 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { zodResponseFormat } from 'openai/helpers/zod.mjs'
 import { z } from 'zod'
-import { CourseOutline } from '../createPathway/route'
 
 export const maxDuration = 300
 

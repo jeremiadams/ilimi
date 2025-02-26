@@ -18,7 +18,7 @@ const Module = z.object({
 	sections: z.array(Section),
 })
 
-export const CourseOutline = z.object({
+const CourseOutline = z.object({
 	title: z.string(),
 	description: z.string(),
 	modules: z.array(Module),
