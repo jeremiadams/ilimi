@@ -33,13 +33,13 @@ const pathVariants = {
 
 const Footer: FC<FooterProps> = ({}) => {
 	return (
-		<footer className='py-10 relative z-50 bg-[#03000a]'>
+		<footer className='pt-20 pb-20 relative z-50 border-t border-gray-900'>
 			<MaxWidthWrapper>
-				<div className='flex items-center justify-between'>
-					<div className='flex gap-3 items-center'>
+				<div className='flex flex-col-reverse sm:flex-row-reverse sm:items-center sm:justify-between'>
+					<div className='flex flex-col gap-6 pt-20 sm:pt-0 sm:-mt-[26px]'>
 						<Link
 							href='/'
-							className='flex z-40 text-lg font-semibold text-white'
+							className='flex z-40 text-lg font-semibold text-white '
 						>
 							<motion.svg
 								width='67'
@@ -88,43 +88,115 @@ const Footer: FC<FooterProps> = ({}) => {
 								/>
 							</motion.svg>
 						</Link>
-						<span className=' text-gray-500 text-xs mt-1'>© 2024</span>
+
+						<div className=' flex gap-3 items-center'>
+							<Link href='mailto:jeremiadamss@gmail.com'>
+								<svg
+									width='30'
+									height='30'
+									viewBox='0 0 30 30'
+									fill='none'
+									xmlns='http://www.w3.org/2000/svg'
+								>
+									<path
+										d='M4.16585 0C0.415854 0.208333 8.66153e-07 3.33333 8.6613e-07 4.375L0 25.5214C6.68925e-05 29.1957 3.03674 30 3.87008 30H25.8284C27.4951 30 29.9951 28.75 30 25.625V4.16667C29.9951 1.45833 27.7034 0 26.0368 0H4.16585ZM6.42857 8.57143H23.5714C23.7 8.57143 23.8213 8.58594 23.9355 8.62165L16.9141 15.6362C15.8569 16.6933 14.1361 16.6933 13.079 15.6362L6.06445 8.62165C6.17874 8.58594 6.3 8.57143 6.42857 8.57143ZM5.05022 9.63588L10.4213 15L5.05022 20.3641C5.01451 20.2498 5 20.1286 5 20V10C5 9.87143 5.01451 9.75016 5.05022 9.63588ZM24.9498 9.63588C24.9855 9.75016 25 9.87143 25 10V20C25 20.1286 24.9855 20.2498 24.9498 20.3641L19.5717 15L24.9498 9.63588ZM11.4286 16.0072L12.0647 16.6504C12.8719 17.4575 13.9359 17.8571 14.993 17.8571C16.0573 17.8571 17.1142 17.4575 17.9213 16.6504L18.5644 16.0072L23.9355 21.3783C23.8213 21.4141 23.7 21.4286 23.5714 21.4286H6.42857C6.3 21.4286 6.17874 21.4141 6.06445 21.3783L11.4286 16.0072Z'
+										fill='white'
+									/>
+								</svg>
+							</Link>
+							<Link
+								href='https://www.linkedin.com/company/ilimi-ai'
+								target='_blank'
+							>
+								<svg
+									width='30'
+									height='30'
+									viewBox='0 0 30 30'
+									fill='none'
+									xmlns='http://www.w3.org/2000/svg'
+								>
+									<path
+										d='M30 25.8333C30 28.135 28.135 30 25.8333 30H4.16667C1.86583 30 0 28.135 0 25.8333V4.16667C0 1.865 1.86583 0 4.16667 0H25.8333C28.135 0 30 1.865 30 4.16667V25.8333Z'
+										fill='#0288D1'
+									/>
+									<path
+										d='M6 11.25H9.75V24H6V11.25ZM7.86375 9.75H7.84275C6.72375 9.75 6 8.916 6 7.87425C6 6.81 6.74625 6 7.8855 6C9.02625 6 9.729 6.81 9.75 7.87425C9.75 8.91525 9.02625 9.75 7.86375 9.75ZM24 24H20.25V17.1757C20.25 15.5272 19.3313 14.4022 17.856 14.4022C16.7303 14.4022 16.1212 15.1613 15.8257 15.8948C15.7177 16.1573 15.75 16.8833 15.75 17.25V24H12V11.25H15.75V13.212C16.2908 12.375 17.1375 11.25 19.3035 11.25C21.987 11.25 23.9993 12.9375 23.9993 16.7055L24 24Z'
+										fill='white'
+									/>
+								</svg>
+							</Link>
+							<Link
+								href='https://www.linkedin.com/in/jeremiadams'
+								target='_blank'
+							>
+								<svg
+									width='30'
+									height='30'
+									viewBox='0 0 30 30'
+									fill='none'
+									xmlns='http://www.w3.org/2000/svg'
+								>
+									<path
+										d='M30 25.8333C30 28.135 28.135 30 25.8333 30H4.16667C1.86583 30 0 28.135 0 25.8333V4.16667C0 1.865 1.86583 0 4.16667 0H25.8333C28.135 0 30 1.865 30 4.16667V25.8333Z'
+										fill='white'
+									/>
+									<path
+										d='M22 23L16.1341 14.2577L16.1441 14.2659L21.4331 8H19.6656L15.357 13.1L11.9355 8H7.30013L12.7766 16.162L12.7759 16.1614L7 23H8.76745L13.5576 17.3259L17.3646 23H22ZM11.2352 9.36364L19.4655 21.6364H18.0649L9.82792 9.36364H11.2352Z'
+										fill='black'
+									/>
+								</svg>
+							</Link>
+						</div>
 					</div>
-					<div className=' flex gap-3 items-center'>
-						<Link href='mailto:jeremiadamss@gmail.com'>
-							<svg
-								width='30'
-								height='30'
-								viewBox='0 0 30 30'
-								fill='none'
-								xmlns='http://www.w3.org/2000/svg'
+					<div className=' flex gap-20'>
+						<div className=' flex flex-col gap-2'>
+							<p className=' text-white font-semibold'>Product</p>
+							<Link
+								href='/dashboard'
+								className=' text-[#A1A1AA] font-light hover:text-white'
 							>
-								<path
-									d='M4.16585 0C0.415854 0.208333 8.66153e-07 3.33333 8.6613e-07 4.375L0 25.5214C6.68925e-05 29.1957 3.03674 30 3.87008 30H25.8284C27.4951 30 29.9951 28.75 30 25.625V4.16667C29.9951 1.45833 27.7034 0 26.0368 0H4.16585ZM6.42857 8.57143H23.5714C23.7 8.57143 23.8213 8.58594 23.9355 8.62165L16.9141 15.6362C15.8569 16.6933 14.1361 16.6933 13.079 15.6362L6.06445 8.62165C6.17874 8.58594 6.3 8.57143 6.42857 8.57143ZM5.05022 9.63588L10.4213 15L5.05022 20.3641C5.01451 20.2498 5 20.1286 5 20V10C5 9.87143 5.01451 9.75016 5.05022 9.63588ZM24.9498 9.63588C24.9855 9.75016 25 9.87143 25 10V20C25 20.1286 24.9855 20.2498 24.9498 20.3641L19.5717 15L24.9498 9.63588ZM11.4286 16.0072L12.0647 16.6504C12.8719 17.4575 13.9359 17.8571 14.993 17.8571C16.0573 17.8571 17.1142 17.4575 17.9213 16.6504L18.5644 16.0072L23.9355 21.3783C23.8213 21.4141 23.7 21.4286 23.5714 21.4286H6.42857C6.3 21.4286 6.17874 21.4141 6.06445 21.3783L11.4286 16.0072Z'
-									fill='white'
-								/>
-							</svg>
-						</Link>
-						<Link href='https://www.linkedin.com/in/jeremiadams' about='_blank'>
-							<svg
-								width='30'
-								height='30'
-								viewBox='0 0 30 30'
-								fill='none'
-								xmlns='http://www.w3.org/2000/svg'
+								Dashboard
+							</Link>
+							<Link
+								href='/'
+								className=' text-[#A1A1AA] font-light hover:text-white'
 							>
-								<path
-									d='M30 25.8333C30 28.135 28.135 30 25.8333 30H4.16667C1.86583 30 0 28.135 0 25.8333V4.16667C0 1.865 1.86583 0 4.16667 0H25.8333C28.135 0 30 1.865 30 4.16667V25.8333Z'
-									fill='#0288D1'
-								/>
-								<path
-									d='M6 11.25H9.75V24H6V11.25ZM7.86375 9.75H7.84275C6.72375 9.75 6 8.916 6 7.87425C6 6.81 6.74625 6 7.8855 6C9.02625 6 9.729 6.81 9.75 7.87425C9.75 8.91525 9.02625 9.75 7.86375 9.75ZM24 24H20.25V17.1757C20.25 15.5272 19.3313 14.4022 17.856 14.4022C16.7303 14.4022 16.1212 15.1613 15.8257 15.8948C15.7177 16.1573 15.75 16.8833 15.75 17.25V24H12V11.25H15.75V13.212C16.2908 12.375 17.1375 11.25 19.3035 11.25C21.987 11.25 23.9993 12.9375 23.9993 16.7055L24 24Z'
-									fill='white'
-								/>
-							</svg>
-						</Link>
+								Sign up
+							</Link>
+							<Link
+								href='/pricing'
+								className=' text-[#A1A1AA] font-light hover:text-white'
+							>
+								Pricing
+							</Link>
+						</div>
+
+						<div className=' flex flex-col gap-2'>
+							<p className=' text-white font-semibold'>Company</p>
+							<Link
+								href='/terms-of-use'
+								className=' text-[#A1A1AA] font-light hover:text-white'
+							>
+								Terms of use
+							</Link>
+							<Link
+								href='privacy-policy'
+								className=' text-[#A1A1AA] font-light hover:text-white'
+							>
+								Privacy policy
+							</Link>
+							<Link
+								href='mailto:jeremiadamss@gmail.com'
+								className=' text-[#A1A1AA] font-light hover:text-white'
+							>
+								Contact
+							</Link>
+						</div>
 					</div>
 				</div>
+				<p className=' sm:text-right text-[#A1A1AA] text-xs pt-3 sm:pt-20'>
+					© 2025 Ilimi Inc.
+				</p>
 			</MaxWidthWrapper>
 		</footer>
 	)
