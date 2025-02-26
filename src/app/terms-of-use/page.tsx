@@ -15,7 +15,7 @@ const Page: FC<PageProps> = ({}) => {
 						Terms of Use
 					</h1>
 					<p className=' mt-5 sm:text-lg text-gray-300'>
-						Effective Date: <span className='font-medium'>Februry, 2024</span>
+						Effective Date: <span className='font-medium'>Februry, 2025</span>
 					</p>
 				</div>
 

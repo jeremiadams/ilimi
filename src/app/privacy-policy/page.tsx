@@ -17,11 +17,11 @@ const Page: FC<PageProps> = ({}) => {
 					<p className=' mt-5 sm:text-lg text-gray-300'>
 						Effective Date:{' '}
 						<span className='font-medium'>
-							Februry, 2024, Ilimi ("we," "our," or "us") is committed to
+							Februry, 2025, Ilimi (\"we,\" \"our,\" or \"us\") is committed to
 							protecting your privacy. This Privacy Policy explains how we
 							collect, use, disclose, and safeguard your information when you
 							use our AI-powered pathway and course generation platform (the
-							"Service").
+							\"Service\").
 						</span>
 					</p>
 				</div>
@@ -72,7 +72,7 @@ const Page: FC<PageProps> = ({}) => {
 						</li>
 						<li>
 							<strong>Legal authorities</strong> if required by law or to
-							protect our rights and users' safety
+							protect our rights and users\' safety
 						</li>
 					</ul>
 
@@ -94,7 +94,7 @@ const Page: FC<PageProps> = ({}) => {
 					</h2>
 					<p className='mb-8'>
 						We may update this Privacy Policy from time to time. Any changes
-						will be posted with the updated "Effective Date."
+						will be posted with the updated \"Effective Date.\"
 					</p>
 				</div>
 			</MaxWidthWrapper>
