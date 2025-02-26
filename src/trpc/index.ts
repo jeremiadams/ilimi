@@ -130,5 +130,53 @@ export const appRouter = router({
 
 		return { url: paystackSession.data.authorization_url }
 	}),
+	saveQuiz: privateProcedure
+		.input(
+			z.object({
+				quizId: z.string(),
+				score: z.number(),
+				questions: z.array(
+					z.object({
+						questionId: z.string(),
+						options: z.array(
+							z.object({
+								id: z.string(),
+								is_selected: z.boolean(),
+							})
+						),
+					})
+				),
+			})
+		)
+		.mutation(async ({ ctx, input }) => {
+			await db.quiz.update({
+				where: {
+					id: input.quizId,
+				},
+				data: {
+					isComplete: true,
+					score: input.score,
+					questions: {
+						update: input.questions.map((question) => {
+							return {
+								where: { id: question.questionId },
+								data: {
+									options: {
+										update: question.options.map((option) => {
+											return {
+												where: { id: option.id },
+												data: {
+													is_selected: option.is_selected,
+												},
+											}
+										}),
+									},
+								},
+							}
+						}),
+					},
+				},
+			})
+		}),
 })
 export type AppRouter = typeof appRouter
