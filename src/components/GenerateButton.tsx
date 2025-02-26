@@ -120,10 +120,10 @@ const GenerateButton: FC<GenerateButtonProps> = ({}) => {
 							disabled={isLoading}
 							onValueChange={(value) => {
 								value === 'beginnerToIntermediate'
-									? setDifficulty('Beginners to Intermediate')
+									? setDifficulty('beginnerToIntermediate')
 									: value === 'expert'
-									? setDifficulty('Experts')
-									: setDifficulty('No Preference')
+									? setDifficulty('expert')
+									: setDifficulty('noPreference')
 							}}
 						>
 							<div className='flex items-center space-x-2'>
@@ -131,9 +131,6 @@ const GenerateButton: FC<GenerateButtonProps> = ({}) => {
 									value='beginnerToIntermediate'
 									id='r1'
 									className='border-[#FAFAFA] text-[#FAFAFA]'
-									// onChange={(e) => {
-									// 	setDifficulty(e.)
-									// }}
 								/>
 								<Label htmlFor='r1'>Beginner to Intermediate</Label>
 							</div>
@@ -188,7 +185,6 @@ const GenerateButton: FC<GenerateButtonProps> = ({}) => {
 						})}
 						onClick={() => {
 							createPathway()
-							const progressInterval = simulatedProgress()
 
 							// clearInterval(progressInterval)
 							setMessage('')

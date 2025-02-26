@@ -1,17 +1,11 @@
 'use client'
 import { FC, useState, useContext } from 'react'
-import DashboardLayout from './DashboardNav'
 import Module from './Module'
 import { useToast } from './ui/use-toast'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { ModulesType } from '@/lib/types/Modules'
-import { AppContext } from '@/context/AppContext'
-import { ArrowRight } from 'lucide-react'
 import GenerateQuizButton from './GenerateQuizButton'
-import { shuffleArray } from '@/lib/utils'
-import { nanoid } from 'nanoid'
-import { QuestionsAndAnswers } from '@/lib/types/QuestionsAndAnswers'
 import { trpc } from '@/app/_trpc/client'
 
 interface OnePathwayProps {
@@ -30,14 +24,18 @@ const OnePathway: FC<OnePathwayProps> = ({
 	modules,
 }) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [isRedirecting, setIsRedirecting] = useState<boolean>(false)
+	const [streamData, setStreamData] = useState<
+		{ streamId: number; content: string }[]
+	>([])
+
+	const [progressFirst, setProgressFirst] = useState<number>(0) // Progress for the first stream
+	const [progressSecond, setProgressSecond] = useState<number>(0)
+	const [progressThird, setProgressThird] = useState<number>(0)
 
 	const { toast } = useToast()
 
 	const router = useRouter()
-
-	const [questions, setQuestions] = useState<QuestionsAndAnswers[] | []>([])
-	const [score, setScore] = useState<number>(0)
-	const [mark, setMark] = useState<boolean>(false)
 
 	const queryClient = useQueryClient()
 
@@ -82,22 +80,116 @@ const OnePathway: FC<OnePathwayProps> = ({
 
 			return { response: response.body, sectionId }
 		},
-		onSuccess: (response) => {
-			setIsLoading(false)
+		onSuccess: async (response) => {
+			// setIsLoading(false)
 			// queryClient.invalidateQueries()
-			markAsComplete({ id: response.sectionId })
-			router.push(`/dashboard/pathways/modules/${response.sectionId}`)
-			return response
+			// markAsComplete({ id: response.sectionId })
+			// router.push(`/dashboard/pathways/modules/${response.sectionId}`)
+			// return response
+			if (!response.response) {
+				return toast({
+					title: 'There was a problem sending this message',
+					description: 'Please refresh and try again',
+					variant: 'destructive',
+				})
+			}
+
+			// if (response.response?.alreadyGenerated) {
+
+			// }
+
+			const reader = response.response.getReader()
+			const decoder = new TextDecoder()
+			let done = false
+
+			const initialChunk = await reader.read()
+			const initialText = decoder.decode(initialChunk.value)
+			const parsed = JSON.parse(initialText)
+
+			if (parsed.alreadyGenerated) {
+				// Redirect immediately if content is already generated
+				router.push(`/dashboard/pathways/modules/${response.sectionId}`)
+				return
+			}
+
+			let chunksFirst = 0 // Tracks chunks received for the first stream
+			let chunksSecond = 0 // Tracks chunks received for the second stream
+			let chunksThird = 0
+			const firstTotalChunks = 580
+			const secondTotalChunks = 700
+			const thirdTotalChunks = 1200
+
+			const chunks: { streamId: number; content: string }[] = []
+
+			while (!done) {
+				const { value, done: streamDone } = await reader.read()
+				done = streamDone
+
+				if (value) {
+					const chunk = decoder.decode(value, { stream: true })
+					chunk.split('\n').forEach((line) => {
+						if (line.trim()) {
+							const parsed = JSON.parse(line)
+							if (parsed.content) {
+								if (parsed.streamId === 1) {
+									chunksFirst += 1
+									setProgressFirst(
+										Math.min((chunksFirst / firstTotalChunks) * 100, 100)
+									)
+								} else if (parsed.streamId === 2) {
+									chunksSecond += 1
+									setProgressSecond(
+										Math.min((chunksSecond / secondTotalChunks) * 100, 100)
+									)
+								} else if (parsed.streamId === 3) {
+									chunksThird += 1
+									setProgressThird(
+										Math.min((chunksSecond / thirdTotalChunks) * 100, 100)
+									)
+								}
+								setStreamData([
+									{ streamId: parsed.streamId, content: parsed.content },
+								])
+								chunks.push({
+									streamId: parsed.streamId,
+									content: parsed.content,
+								})
+							}
+						}
+					})
+				}
+			}
+			if (chunksFirst > 0) {
+				setProgressFirst(100) // Update first stream's progress to 100%
+			}
+			if (chunksSecond > 0) {
+				setProgressSecond(100) // Update second stream's progress to 100%
+			}
+			if (chunksThird > 0) {
+				setProgressThird(100) // Update second stream's progress to 100%
+			}
+
+			if (chunksFirst > 0 && chunksSecond > 0 && chunksThird > 0) {
+				setIsRedirecting(true)
+				markAsComplete({ id: response.sectionId })
+				router.push(`/dashboard/pathways/modules/${response.sectionId}`)
+			}
+
+			return chunks
 		},
 		onMutate: () => {
 			setIsLoading(true)
+			setIsRedirecting(false)
+			setProgressFirst(0)
+			setProgressSecond(0)
+			setStreamData([])
 		},
 		onSettled: () => {
 			setIsLoading(false)
 		},
 		onError: () => {
 			return toast({
-				title: 'There was an error generating content',
+				title: 'There was an error streaming content',
 				description: 'Please try again',
 				variant: 'destructive',
 			})
@@ -111,6 +203,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 				body: JSON.stringify({
 					pathwayId: id,
 					pathwayTitle: title,
+					difficulty,
 				}),
 			})
 
@@ -122,22 +215,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 		},
 		onSuccess: (response) => {
 			setIsLoading(false)
-			setQuestions(
-				response.questionsAndAnswers.map((item: QuestionsAndAnswers) => {
-					return {
-						...item,
-						answers: shuffleArray(
-							item.answers.map((item) => {
-								return {
-									...item,
-									id: nanoid(),
-									isSelected: false,
-								}
-							})
-						),
-					}
-				})
-			)
+			router.push(`/dashboard/pathways/quiz/${response.quizId}`)
 		},
 		onMutate: () => {
 			setIsLoading(true)
@@ -153,55 +231,6 @@ const OnePathway: FC<OnePathwayProps> = ({
 			})
 		},
 	})
-
-	const checkSelected = (id: string, question: string) => {
-		setQuestions((prevQuestions) =>
-			prevQuestions.map((item) => {
-				if (item.question === question) {
-					return {
-						...item,
-						answers: item.answers.map((answer) => {
-							if (answer.id === id) {
-								return {
-									...answer,
-									isSelected: true,
-								}
-							} else {
-								return {
-									...answer,
-									isSelected: false,
-								}
-							}
-						}),
-					}
-				} else {
-					return item
-				}
-			})
-		)
-	}
-
-	const checkAnswers = () => {
-		setMark(true)
-		for (const question of questions) {
-			for (let i = 0; i < question.answers.length; i++) {
-				if (
-					question.answers[i].isSelected === true &&
-					question.answers[i].isCorrect
-				) {
-					setScore((prevScore) => prevScore + 1)
-				} else {
-					continue
-				}
-			}
-		}
-	}
-
-	const resetQuiz = () => {
-		setQuestions([])
-		setMark(false)
-		setScore(0)
-	}
 
 	return (
 		<>
@@ -219,22 +248,18 @@ const OnePathway: FC<OnePathwayProps> = ({
 						index={ind}
 						title={item.title}
 						isLoading={isLoading}
+						isRedirecting={isRedirecting}
 						generateContent={generateContent}
+						streamData={streamData}
+						progressFirst={progressFirst}
+						progressSecond={progressSecond}
+						progressThird={progressThird}
 						sections={item.Section}
 						difficulty={difficulty}
 					/>
 				))}
 			</div>
-			<GenerateQuizButton
-				isLoading={isLoading}
-				generateQuiz={generateQuiz}
-				questions={questions}
-				checkSelected={checkSelected}
-				checkAnswers={checkAnswers}
-				mark={mark}
-				score={score}
-				resetQuiz={resetQuiz}
-			/>
+			<GenerateQuizButton isLoading={isLoading} generateQuiz={generateQuiz} />
 		</>
 	)
 }
