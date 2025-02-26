@@ -3,8 +3,31 @@ import { openai } from '@/lib/openai'
 import { GenerateQuizValidator } from '@/lib/validators/GenerateQuizValidator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { zodResponseFormat } from 'openai/helpers/zod.mjs'
+import { z } from 'zod'
+import { CourseOutline } from '../createPathway/route'
 
 export const maxDuration = 300
+
+const questionTypeSchema = z.enum(['MULTIPLE_SELECT', 'MULTIPLE_CHOICE'])
+
+const optionSchema = z.object({
+	id: z.string(),
+	text: z.string(),
+	is_correct: z.boolean(),
+})
+
+const questionSchema = z.object({
+	id: z.number(),
+	type: questionTypeSchema,
+	question: z.string(),
+	options: z.array(optionSchema),
+	explanation: z.string(),
+})
+
+const quizSchema = z.object({
+	questions: z.array(questionSchema),
+})
 
 export const POST = async (req: NextRequest) => {
 	const body = await req.json()
@@ -16,7 +39,8 @@ export const POST = async (req: NextRequest) => {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
-	const { pathwayId, pathwayTitle } = GenerateQuizValidator.parse(body)
+	const { pathwayId, pathwayTitle, difficulty } =
+		GenerateQuizValidator.parse(body)
 
 	const pathway = await db.pathway.findFirst({
 		where: {
@@ -48,90 +72,73 @@ export const POST = async (req: NextRequest) => {
 		content: msg.content,
 	}))
 
-	let response = await openai.chat.completions.create({
-		model: 'gpt-4o-mini',
+	const prompt = `Create a quiz with about 17 to 30 questions on the course ${pathwayTitle} ${
+		difficulty !== 'No Preference' ? `for ${difficulty}` : ':'
+	}. The quiz should include: 
+	1. Multiple-choice questions ( with single correct answers, true or false, e.t.c).
+	2. Multiple-select questions ( with multiple correct answers )
+	3. Include options for each question and indicate the correct answer(s).
+	4. An explanation for each correct answer.`
+
+	const completion = await openai.beta.chat.completions.parse({
+		model: 'gpt-4o',
 		messages: [
-			{
-				role: 'system',
-				content:
-					"You're a teaching assistant and your job is to teach users by helping them generate multi choice questions and answers for courses already created.",
-			},
+			...formattedPrevMessages,
 			{
 				role: 'user',
-				content: `Generate a quiz with a maximum of 20 questions for the course: ${pathwayTitle}. Use the following pieces of information (which is in a stringified JSON format ) for context on the course modules for ${pathwayTitle} that have already been generated:
-
-	            \n----------------\n
-
-	            CONTEXT:
-	            ${formattedPrevMessages.map((message) => {
-								if (message.role === 'user') return `User: ${message.content}\n`
-								return `Assistant: ${message.content}\n`
-							})}
-	            `,
+				content: prompt,
 			},
 		],
-		functions: [
-			{
-				name: 'generateQuiz',
-				description: 'Generate a quiz for a course ',
-				parameters: {
-					type: 'object',
-					properties: {
-						questionsAndAnswers: {
-							type: 'array',
-							description:
-								'An array of questions consisting of objects that have a question and an array of answers',
-							items: {
-								type: 'object',
-								properties: {
-									question: {
-										type: 'string',
-										description: 'The question',
-									},
-									answers: {
-										type: 'array',
-										description:
-											'An array of answers consisting of objects that have one correct answer and other wrong answers',
-										items: {
-											type: 'object',
-											properties: {
-												answer: {
-													type: 'string',
-													description: 'An answer to the question.',
-												},
-												isCorrect: {
-													type: 'boolean',
-													description:
-														'A boolean to describe if the answer is true or false',
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-					required: ['questionsAndAnswers'],
-				},
-			},
-		],
-		function_call: { name: 'generateQuiz' },
+		response_format: zodResponseFormat(quizSchema, 'quizSchema'),
 	})
 
-	if (
-		typeof response.choices[0].message.function_call?.arguments === 'string' &&
-		typeof JSON.parse(response.choices[0].message.function_call?.arguments) ===
-			'object'
-	) {
-		const quizContent = JSON.parse(
-			response.choices[0].message.function_call?.arguments
-		)
+	const quiz = completion.choices[0].message
 
-		return NextResponse.json(quizContent, { status: 200 })
+	if (quiz.refusal) {
+		return NextResponse.json({ error: quiz.refusal }, { status: 400 })
 	} else {
+		const newQuiz = await db.quiz.create({
+			data: {
+				questions: {
+					create: quiz.parsed?.questions.map((item) => {
+						return {
+							type: item.type,
+							question: item.question,
+							options: {
+								create: item.options.map((option) => {
+									return {
+										text: option.text,
+										is_correct: option.is_correct,
+									}
+								}),
+							},
+							explanation: item.explanation,
+						}
+					}),
+				},
+				pathwayId,
+			},
+		})
 		return NextResponse.json(
-			{ error: 'Error generating quiz' },
-			{ status: 400 }
+			{ quizId: newQuiz.id, questions: quiz.parsed },
+			{ status: 200 }
 		)
 	}
+
+	// if (
+	// 	typeof response.choices[0].message.function_call?.arguments === 'string' &&
+	// 	typeof JSON.parse(response.choices[0].message.function_call?.arguments) ===
+	// 		'object'
+	// ) {
+	// 	const quizContent = JSON.parse(
+	// 		response.choices[0].message.function_call?.arguments
+	// 	)
+
+	// 	return NextResponse.json(quizContent, { status: 200 })
+	// } else {
+	// 	return NextResponse.json(
+	// 		{ error: 'Error generating quiz' },
+	// 		{ status: 400 }
+	// 	)
+	// }
 }

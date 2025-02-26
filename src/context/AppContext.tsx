@@ -1,6 +1,7 @@
 'use client'
 
 import { useToast } from '@/components/ui/use-toast'
+import { Questions } from '@/lib/types/QuestionsAndAnswers'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
 	ChangeEvent,
@@ -21,7 +22,9 @@ interface AppContextProps {
 	setIsOpen: Dispatch<SetStateAction<boolean>>
 	setMessage: Dispatch<SetStateAction<string>>
 	difficulty: string
-	setDifficulty: Dispatch<SetStateAction<string>>
+	setDifficulty: Dispatch<
+		SetStateAction<'beginnerToIntermediate' | 'expert' | 'noPreference'>
+	>
 }
 
 export const AppContext = createContext<AppContextProps>({
@@ -44,7 +47,9 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 	children,
 }) => {
 	const [message, setMessage] = useState<string>('')
-	const [difficulty, setDifficulty] = useState<string>('beginnerToIntermediate')
+	const [difficulty, setDifficulty] = useState<
+		'beginnerToIntermediate' | 'expert' | 'noPreference'
+	>('beginnerToIntermediate')
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [isOpen, setIsOpen] = useState<boolean>(false)
 
@@ -64,7 +69,12 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 				method: 'POST',
 				body: JSON.stringify({
 					message,
-					difficulty,
+					difficulty:
+						difficulty === 'beginnerToIntermediate'
+							? 'Beginners to Intermediate'
+							: difficulty === 'expert'
+							? 'Experts'
+							: 'No Preference',
 				}),
 			})
 

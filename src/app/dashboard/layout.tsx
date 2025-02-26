@@ -1,6 +1,7 @@
 import DashboardNav from '@/components/DashboardNav'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { ReactNode } from 'react'
+import { Toaster } from '@/components/ui/sonner'
 
 export default async function Layout({ children }: { children: ReactNode }) {
 	const { getUser } = getKindeServerSession()

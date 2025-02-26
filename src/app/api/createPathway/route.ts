@@ -7,7 +7,6 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
-import { title } from 'process'
 
 export const maxDuration = 300
 
@@ -19,7 +18,7 @@ const Module = z.object({
 	sections: z.array(Section),
 })
 
-const CourseOutline = z.object({
+export const CourseOutline = z.object({
 	title: z.string(),
 	description: z.string(),
 	modules: z.array(Module),
@@ -48,15 +47,15 @@ export const POST = async (req: NextRequest) => {
 	const isFreeExceeded =
 		pathwaysAmt.length > PLANS.find((plan) => plan.name === 'Free')!?.quota
 
-	// if (!subscriptionPlan.isSubscribed && isFreeExceeded) {
-	// 	return NextResponse.json(
-	// 		{
-	// 			error:
-	// 				'Maximum amount of pathways generated for your current plan. Upgrade to PRO!',
-	// 		},
-	// 		{ status: 403 }
-	// 	)
-	// }
+	if (!subscriptionPlan.isSubscribed && isFreeExceeded) {
+		return NextResponse.json(
+			{
+				error:
+					'Maximum amount of pathways generated for your current plan. Upgrade to PRO!',
+			},
+			{ status: 403 }
+		)
+	}
 
 	const { message, difficulty } = SendMessageValidator.parse(body)
 
@@ -101,52 +100,6 @@ export const POST = async (req: NextRequest) => {
 			},
 		],
 		response_format: zodResponseFormat(CourseOutline, 'course_outline'),
-		// functions: [
-		// 	{
-		// 		name: 'createCourseOutline',
-		// 		description: 'Create a course outline',
-		// 		parameters: {
-		// 			type: 'object',
-		// 			properties: {
-		// 				title: {
-		// 					type: 'string',
-		// 					description: 'The title of the course the user wants to generate',
-		// 				},
-		// 				description: {
-		// 					type: 'string',
-		// 					description: 'An overview of what the course is about',
-		// 				},
-		// 				modules: {
-		// 					type: 'array',
-		// 					description:
-		// 						'An array of modules in the course outline consisting of objects that have a title and a description for each module',
-		// 					items: {
-		// 						type: 'object',
-		// 						properties: {
-		// 							title: {
-		// 								type: 'string',
-		// 								description:
-		// 									'The title of a module. Just the title text, ensure not to include what module number it is',
-		// 							},
-		// 							description: {
-		// 								type: 'string',
-		// 							},
-		// 							sections: {
-		// 								type: 'array',
-		// 								description: 'sections under a given module',
-		// 								items: {
-		// 									type: 'text',
-		// 								},
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 			required: ['title', 'description', 'modules'],
-		// 		},
-		// 	},
-		// ],
-		// function_call: { name: 'createCourseOutline' },
 	})
 
 	const course_outline = completion.choices[0].message

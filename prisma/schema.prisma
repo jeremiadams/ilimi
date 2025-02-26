@@ -39,6 +39,11 @@ enum MessageRoles {
   ASSISTANT
 }
 
+enum QuestionType {
+  MULTIPLE_SELECT
+  MULTIPLE_CHOICE
+}
+
 model Pathway {
   id            String        @id @default(cuid())
   title         String
@@ -50,6 +55,7 @@ model Pathway {
 
   Module  Module[]
   Message Message[]
+  Quiz    Quiz[]
 
   User   User?   @relation(fields: [userId], references: [id])
   userId String?
@@ -96,4 +102,34 @@ model Message {
   pathwayId String?
   Section   Section? @relation(fields: [sectionId], references: [id])
   sectionId String?
+}
+
+model QuestionOption {
+  id          String    @id @default(cuid())
+  text        String
+  is_correct  Boolean
+  is_selected Boolean   @default(false)
+  Question    Question? @relation(fields: [questionId], references: [id])
+  questionId  String?
+}
+
+model Question {
+  id String @id @default(cuid())
+
+  type        QuestionType
+  question    String
+  options     QuestionOption[]
+  explanation String
+  Quiz        Quiz?            @relation(fields: [quizId], references: [id])
+  quizId      String?
+}
+
+model Quiz {
+  id         String  @id @default(cuid())
+  isComplete Boolean @default(false)
+  score      Int?
+
+  questions Question[]
+  Pathway   Pathway?   @relation(fields: [pathwayId], references: [id])
+  pathwayId String?
 }

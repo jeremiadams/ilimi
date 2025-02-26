@@ -113,3 +113,12 @@
 /* #7e9dfc*/
 /* #f5cbb6*/
 /* #ca99e9*/
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+	}
+  body {
+    @apply bg-background text-foreground;
+	}
+}

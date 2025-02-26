@@ -1,9 +1,14 @@
-export interface QuestionsAndAnswers {
+export interface Options {
+	id: string
+	text: string
+	is_correct: boolean
+	is_selected: boolean
+}
+
+export interface Questions {
+	id: string
+	type: 'MULTIPLE_SELECT' | 'MULTIPLE_CHOICE'
 	question: string
-	answers: {
-		answer: string
-		isCorrect: boolean
-		id?: string
-		isSelected?: boolean
-	}[]
+	options: Options[]
+	explanation: string
 }

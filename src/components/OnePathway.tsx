@@ -1,17 +1,11 @@
 'use client'
 import { FC, useState, useContext } from 'react'
-import DashboardLayout from './DashboardNav'
 import Module from './Module'
 import { useToast } from './ui/use-toast'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { ModulesType } from '@/lib/types/Modules'
-import { AppContext } from '@/context/AppContext'
-import { ArrowRight } from 'lucide-react'
 import GenerateQuizButton from './GenerateQuizButton'
-import { shuffleArray } from '@/lib/utils'
-import { nanoid } from 'nanoid'
-import { QuestionsAndAnswers } from '@/lib/types/QuestionsAndAnswers'
 import { trpc } from '@/app/_trpc/client'
 
 interface OnePathwayProps {
@@ -39,30 +33,9 @@ const OnePathway: FC<OnePathwayProps> = ({
 	const [progressSecond, setProgressSecond] = useState<number>(0)
 	const [progressThird, setProgressThird] = useState<number>(0)
 
-	// const simulatedProgress = () => {
-	// 	setGenerateProgress(0)
-
-	// 	const interval = setInterval(() => {
-	// 		setGenerateProgress((prevProgress) => {
-	// 			if (prevProgress >= 95) {
-	// 				clearInterval(interval)
-	// 				return prevProgress
-	// 			}
-
-	// 			return prevProgress + 1
-	// 		})
-	// 	}, 500)
-
-	// 	return interval
-	// }
-
 	const { toast } = useToast()
 
 	const router = useRouter()
-
-	const [questions, setQuestions] = useState<QuestionsAndAnswers[] | []>([])
-	const [score, setScore] = useState<number>(0)
-	const [mark, setMark] = useState<boolean>(false)
 
 	const queryClient = useQueryClient()
 
@@ -216,7 +189,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 		},
 		onError: () => {
 			return toast({
-				title: 'There was an error generating content',
+				title: 'There was an error streaming content',
 				description: 'Please try again',
 				variant: 'destructive',
 			})
@@ -230,6 +203,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 				body: JSON.stringify({
 					pathwayId: id,
 					pathwayTitle: title,
+					difficulty,
 				}),
 			})
 
@@ -241,22 +215,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 		},
 		onSuccess: (response) => {
 			setIsLoading(false)
-			setQuestions(
-				response.questionsAndAnswers.map((item: QuestionsAndAnswers) => {
-					return {
-						...item,
-						answers: shuffleArray(
-							item.answers.map((item) => {
-								return {
-									...item,
-									id: nanoid(),
-									isSelected: false,
-								}
-							})
-						),
-					}
-				})
-			)
+			router.push(`/dashboard/pathways/quiz/${response.quizId}`)
 		},
 		onMutate: () => {
 			setIsLoading(true)
@@ -272,57 +231,6 @@ const OnePathway: FC<OnePathwayProps> = ({
 			})
 		},
 	})
-
-	const checkSelected = (id: string, question: string) => {
-		setQuestions((prevQuestions) =>
-			prevQuestions.map((item) => {
-				if (item.question === question) {
-					return {
-						...item,
-						answers: item.answers.map((answer) => {
-							if (answer.id === id) {
-								return {
-									...answer,
-									isSelected: true,
-								}
-							} else {
-								return {
-									...answer,
-									isSelected: false,
-								}
-							}
-						}),
-					}
-				} else {
-					return item
-				}
-			})
-		)
-	}
-
-	const checkAnswers = () => {
-		setMark(true)
-		for (const question of questions) {
-			for (let i = 0; i < question.answers.length; i++) {
-				if (
-					question.answers[i].isSelected === true &&
-					question.answers[i].isCorrect
-				) {
-					setScore((prevScore) => prevScore + 1)
-				} else {
-					continue
-				}
-			}
-		}
-	}
-
-	const resetQuiz = () => {
-		setQuestions([])
-		setMark(false)
-		setScore(0)
-	}
-
-	// console.log(streamData)
 
 	return (
 		<>
@@ -351,16 +259,7 @@ const OnePathway: FC<OnePathwayProps> = ({
 					/>
 				))}
 			</div>
-			<GenerateQuizButton
-				isLoading={isLoading}
-				generateQuiz={generateQuiz}
-				questions={questions}
-				checkSelected={checkSelected}
-				checkAnswers={checkAnswers}
-				mark={mark}
-				score={score}
-				resetQuiz={resetQuiz}
-			/>
+			<GenerateQuizButton isLoading={isLoading} generateQuiz={generateQuiz} />
 		</>
 	)
 }
