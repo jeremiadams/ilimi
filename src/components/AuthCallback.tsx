@@ -20,7 +20,7 @@ const AuthCallback: FC<AuthCallbackProps> = ({}) => {
 		})
 
 	if (isSuccess) {
-		router.push(origin ? `/${origin}` : 'dashboard')
+		router.push(origin ? `/${origin}` : '/dashboard')
 	} else if (isError) {
 		if (error.data?.code === 'UNAUTHORIZED') {
 			router.push('/')
