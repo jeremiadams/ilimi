@@ -212,40 +212,48 @@ export const POST = async (req: NextRequest) => {
 		})
 
 		stream.on('content.done', async (props) => {
-			await db.section.update({
-				where: {
-					id: sectionId,
-					moduleId,
-				},
-				data: {
-					content: props.parsed?.content,
-					pathwayStatus: 'PENDING',
-				},
-			})
-			await db.message.createMany({
-				data: [
-					...newMessages.map((item) => {
-						return {
-							role:
-								item.role === 'user'
-									? ('USER' as const)
-									: item.role === 'assistant'
-									? ('ASSISTANT' as const)
-									: ('SYSTEM' as const),
-							content: item.content,
+			try {
+				if (!props.parsed?.content) {
+					throw new Error('Failed to evaluate content')
+				}
+				await db.section.update({
+					where: {
+						id: sectionId,
+						moduleId,
+					},
+					data: {
+						content: props.parsed.content,
+						pathwayStatus: 'PENDING',
+					},
+				})
+				await db.message.createMany({
+					data: [
+						...newMessages.map((item) => {
+							return {
+								role:
+									item.role === 'user'
+										? ('USER' as const)
+										: item.role === 'assistant'
+										? ('ASSISTANT' as const)
+										: ('SYSTEM' as const),
+								content: item.content,
+								sectionId,
+								userId: user.id,
+							}
+						}),
+						{
+							role: 'ASSISTANT',
+							content: props.parsed.content,
 							sectionId,
 							userId: user.id,
-						}
-					}),
-					{
-						role: 'ASSISTANT',
-						content: props.parsed?.content!,
-						sectionId,
-						userId: user.id,
-					},
-				],
-			})
-			controller.close() // Close the stream when the second function is done
+						},
+					],
+				})
+				controller.close()
+			} catch (err) {
+				console.error('Error in evaluate content.done:', err)
+				controller.error(err)
+			}
 		})
 
 		stream.on('error', (err) => {
@@ -290,7 +298,15 @@ export const POST = async (req: NextRequest) => {
 		})
 
 		stream.on('content.done', async (props) => {
-			await evaluateContent(props.parsed?.content!, controller)
+			try {
+				if (!props.parsed?.content) {
+					throw new Error('Failed to refine content')
+				}
+				await evaluateContent(props.parsed.content, controller)
+			} catch (err) {
+				console.error('Error in refine content.done:', err)
+				controller.error(err)
+			}
 		})
 
 		stream.on('error', (err) => {
@@ -371,7 +387,15 @@ export const POST = async (req: NextRequest) => {
 						}
 					})
 					.on('content.done', async (props) => {
-						await refineContent(props.parsed?.content!, controller)
+						try {
+							if (!props.parsed?.content) {
+								throw new Error('Failed to generate initial content')
+							}
+							await refineContent(props.parsed.content, controller)
+						} catch (err) {
+							console.error('Error in content.done:', err)
+							controller.error(err)
+						}
 					})
 					.on('error', (err) => {
 						console.error('Stream error:', err)
