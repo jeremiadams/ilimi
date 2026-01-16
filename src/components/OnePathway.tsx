@@ -1,5 +1,5 @@
 'use client'
-import { FC, useState, useContext } from 'react'
+import { FC, useState } from 'react'
 import Module from './Module'
 import { useToast } from './ui/use-toast'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -25,18 +25,11 @@ const OnePathway: FC<OnePathwayProps> = ({
 }) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [isRedirecting, setIsRedirecting] = useState<boolean>(false)
-	const [streamData, setStreamData] = useState<
-		{ streamId: number; content: string }[]
-	>([])
-
-	const [progressFirst, setProgressFirst] = useState<number>(0) // Progress for the first stream
-	const [progressSecond, setProgressSecond] = useState<number>(0)
-	const [progressThird, setProgressThird] = useState<number>(0)
+	const [progress, setProgress] = useState<number>(0)
+	const [contentPreview, setContentPreview] = useState<string>('')
 
 	const { toast } = useToast()
-
 	const router = useRouter()
-
 	const queryClient = useQueryClient()
 
 	const { mutate: markAsComplete } = trpc.markSectionAsComplete.useMutation({
@@ -81,11 +74,6 @@ const OnePathway: FC<OnePathwayProps> = ({
 			return { response: response.body, sectionId }
 		},
 		onSuccess: async (response) => {
-			// setIsLoading(false)
-			// queryClient.invalidateQueries()
-			// markAsComplete({ id: response.sectionId })
-			// router.push(`/dashboard/pathways/modules/${response.sectionId}`)
-			// return response
 			if (!response.response) {
 				return toast({
 					title: 'There was a problem sending this message',
@@ -94,32 +82,33 @@ const OnePathway: FC<OnePathwayProps> = ({
 				})
 			}
 
-			// if (response.response?.alreadyGenerated) {
-
-			// }
-
 			const reader = response.response.getReader()
 			const decoder = new TextDecoder()
 			let done = false
 
+			// Check first chunk for already generated content
 			const initialChunk = await reader.read()
 			const initialText = decoder.decode(initialChunk.value)
-			const parsed = JSON.parse(initialText)
 
-			if (parsed.alreadyGenerated) {
-				// Redirect immediately if content is already generated
-				router.push(`/dashboard/pathways/modules/${response.sectionId}`)
-				return
+			try {
+				const parsed = JSON.parse(initialText)
+				if (parsed.alreadyGenerated) {
+					router.push(`/dashboard/pathways/modules/${response.sectionId}`)
+					return
+				}
+
+				// First chunk might contain content
+				if (parsed.content) {
+					setContentPreview(parsed.content)
+					setProgress(5)
+				}
+			} catch {
+				// Initial chunk might be content, not JSON object
 			}
 
-			let chunksFirst = 0 // Tracks chunks received for the first stream
-			let chunksSecond = 0 // Tracks chunks received for the second stream
-			let chunksThird = 0
-			const firstTotalChunks = 580
-			const secondTotalChunks = 700
-			const thirdTotalChunks = 1200
-
-			const chunks: { streamId: number; content: string }[] = []
+			let chunks = 0
+			const estimatedTotalChunks = 800 // Single stream estimate
+			let fullContent = ''
 
 			while (!done) {
 				const { value, done: streamDone } = await reader.read()
@@ -129,60 +118,57 @@ const OnePathway: FC<OnePathwayProps> = ({
 					const chunk = decoder.decode(value, { stream: true })
 					chunk.split('\n').forEach((line) => {
 						if (line.trim()) {
-							const parsed = JSON.parse(line)
-							if (parsed.content) {
-								if (parsed.streamId === 1) {
-									chunksFirst += 1
-									setProgressFirst(
-										Math.min((chunksFirst / firstTotalChunks) * 100, 100)
+							try {
+								const parsed = JSON.parse(line)
+
+								if (parsed.content) {
+									chunks += 1
+									fullContent += parsed.content
+									setProgress(
+										Math.min((chunks / estimatedTotalChunks) * 100, 95)
 									)
-								} else if (parsed.streamId === 2) {
-									chunksSecond += 1
-									setProgressSecond(
-										Math.min((chunksSecond / secondTotalChunks) * 100, 100)
-									)
-								} else if (parsed.streamId === 3) {
-									chunksThird += 1
-									setProgressThird(
-										Math.min((chunksSecond / thirdTotalChunks) * 100, 100)
-									)
+									// Update preview with last ~200 chars
+									if (fullContent.length > 200) {
+										setContentPreview(
+											'...' + fullContent.slice(-200)
+										)
+									} else {
+										setContentPreview(fullContent)
+									}
 								}
-								setStreamData([
-									{ streamId: parsed.streamId, content: parsed.content },
-								])
-								chunks.push({
-									streamId: parsed.streamId,
-									content: parsed.content,
-								})
+
+								if (parsed.done) {
+									setProgress(100)
+								}
+
+								if (parsed.error) {
+									throw new Error(parsed.error)
+								}
+							} catch (parseError) {
+								// Ignore parse errors for incomplete JSON
 							}
 						}
 					})
 				}
 			}
-			if (chunksFirst > 0) {
-				setProgressFirst(100) // Update first stream's progress to 100%
-			}
-			if (chunksSecond > 0) {
-				setProgressSecond(100) // Update second stream's progress to 100%
-			}
-			if (chunksThird > 0) {
-				setProgressThird(100) // Update second stream's progress to 100%
-			}
 
-			if (chunksFirst > 0 && chunksSecond > 0 && chunksThird > 0) {
+			// Complete
+			if (chunks > 0) {
+				setProgress(100)
 				setIsRedirecting(true)
 				markAsComplete({ id: response.sectionId })
-				router.push(`/dashboard/pathways/modules/${response.sectionId}`)
-			}
 
-			return chunks
+				// Small delay before redirect to show completion state
+				setTimeout(() => {
+					router.push(`/dashboard/pathways/modules/${response.sectionId}`)
+				}, 500)
+			}
 		},
 		onMutate: () => {
 			setIsLoading(true)
 			setIsRedirecting(false)
-			setProgressFirst(0)
-			setProgressSecond(0)
-			setStreamData([])
+			setProgress(0)
+			setContentPreview('')
 		},
 		onSettled: () => {
 			setIsLoading(false)
@@ -250,10 +236,8 @@ const OnePathway: FC<OnePathwayProps> = ({
 						isLoading={isLoading}
 						isRedirecting={isRedirecting}
 						generateContent={generateContent}
-						streamData={streamData}
-						progressFirst={progressFirst}
-						progressSecond={progressSecond}
-						progressThird={progressThird}
+						progress={progress}
+						contentPreview={contentPreview}
 						sections={item.Section}
 						difficulty={difficulty}
 					/>

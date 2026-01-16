@@ -25,6 +25,8 @@ interface AppContextProps {
 	setDifficulty: Dispatch<
 		SetStateAction<'beginnerToIntermediate' | 'expert' | 'noPreference'>
 	>
+	currentStep: number
+	isRedirecting: boolean
 }
 
 export const AppContext = createContext<AppContextProps>({
@@ -37,6 +39,8 @@ export const AppContext = createContext<AppContextProps>({
 	setMessage: () => {},
 	difficulty: '',
 	setDifficulty: () => {},
+	currentStep: 0,
+	isRedirecting: false,
 })
 
 interface AppContextProviderProps {
@@ -52,6 +56,8 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 	>('beginnerToIntermediate')
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [isOpen, setIsOpen] = useState<boolean>(false)
+	const [currentStep, setCurrentStep] = useState<number>(0)
+	const [isRedirecting, setIsRedirecting] = useState<boolean>(false)
 
 	const { toast } = useToast()
 
@@ -65,6 +71,9 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 			message: string
 			difficulty: string
 		}) => {
+			// Step 1: Validating input
+			setCurrentStep(1)
+
 			const response = await fetch('/api/createPathway', {
 				method: 'POST',
 				body: JSON.stringify({
@@ -78,29 +87,44 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 				}),
 			})
 
+			// Step 2: Generating (happens server-side, simulate progress)
+			setCurrentStep(2)
+
 			if (!response.ok) {
 				const errorData = await response.json()
 				throw new Error(errorData.error)
 			}
 
-			return response.body
+			// Step 3: Creating pathway
+			setCurrentStep(3)
+
+			return response.json()
 		},
 		onSuccess: () => {
-			setIsLoading(false)
-			setIsOpen(false)
+			setCurrentStep(4)
+			setIsRedirecting(true)
 			queryClient.invalidateQueries()
+			setTimeout(() => {
+				setIsLoading(false)
+				setIsOpen(false)
+				setIsRedirecting(false)
+				setCurrentStep(0)
+			}, 1000)
 		},
 		onMutate: () => {
 			setIsLoading(true)
 			setIsOpen(true)
+			setCurrentStep(1)
+			setIsRedirecting(false)
 		},
 		onSettled: () => {
-			setIsLoading(false)
-			setIsOpen(false)
+			// Don't reset immediately, let success handler do it
 		},
 		onError: (error) => {
 			setIsLoading(false)
 			setIsOpen(false)
+			setCurrentStep(0)
+			setIsRedirecting(false)
 			return toast({
 				title: error.message,
 				description: 'Please try again',
@@ -127,6 +151,8 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({
 				setMessage,
 				difficulty,
 				setDifficulty,
+				currentStep,
+				isRedirecting,
 			}}
 		>
 			{children}

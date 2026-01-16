@@ -35,10 +35,8 @@ interface SectionProps {
 		moduleId: string
 		difficulty: string
 	}) => void
-	streamData: { streamId: number; content: string }[]
-	progressFirst: number
-	progressSecond: number
-	progressThird: number
+	progress: number
+	contentPreview: string
 	isLoading: boolean
 	isRedirecting: boolean
 	difficulty: string
@@ -52,10 +50,8 @@ const Section: FC<SectionProps> = ({
 	moduleId,
 	pathwayStatus,
 	generateContent,
-	progressFirst,
-	progressSecond,
-	progressThird,
-	streamData,
+	progress,
+	contentPreview,
 	isLoading,
 	isRedirecting,
 	difficulty,
@@ -112,7 +108,7 @@ const Section: FC<SectionProps> = ({
 				className='sm:max-w-lg border-[#27272A]'
 			>
 				<DialogHeader>
-					{streamData.length === 0 ? (
+					{progress === 0 && !contentPreview ? (
 						<DialogTitle className='text-lg pt-5 pb-2'>
 							<div className=' text-xl flex justify-center items-center'>
 								<div className='flex flex-col items-center'>
@@ -131,16 +127,13 @@ const Section: FC<SectionProps> = ({
 									<span className=' font-semibold line-clamp-2'>
 										Generating content for: {title}
 									</span>
-									<span className=' text-sm '>{streamData[0]?.content}</span>
 								</div>
 							</div>
 							<div className=' pl-5'>
 								<GenerateContentLoadingDialog
-									streamData={streamData}
-									progressFirst={progressFirst}
-									progressSecond={progressSecond}
-									progressThird={progressThird}
+									progress={progress}
 									isRedirecting={isRedirecting}
+									contentPreview={contentPreview}
 								/>
 							</div>
 						</DialogDescription>

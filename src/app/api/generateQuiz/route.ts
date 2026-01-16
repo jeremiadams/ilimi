@@ -79,8 +79,8 @@ export const POST = async (req: NextRequest) => {
 	3. Include options for each question and indicate the correct answer(s).
 	4. An explanation for each correct answer.`
 
-	const completion = await openai.beta.chat.completions.parse({
-		model: 'gpt-4o',
+	const completion = await openai.chat.completions.parse({
+		model: 'gpt-5-nano',
 		messages: [
 			...formattedPrevMessages,
 			{

@@ -1,7 +1,6 @@
 'use client'
 
-import { FC, useState } from 'react'
-import { Badge } from './ui/badge'
+import { FC } from 'react'
 import {
 	Accordion,
 	AccordionContent,
@@ -30,10 +29,8 @@ interface ModuleProps {
 		moduleId: string
 		difficulty: string
 	}) => void
-	streamData: { streamId: number; content: string }[]
-	progressFirst: number
-	progressSecond: number
-	progressThird: number
+	progress: number
+	contentPreview: string
 	isLoading: boolean
 	isRedirecting: boolean
 	sections: SectionsType[]
@@ -45,10 +42,8 @@ const Module: FC<ModuleProps> = ({
 	title,
 	index,
 	generateContent,
-	streamData,
-	progressFirst,
-	progressSecond,
-	progressThird,
+	progress,
+	contentPreview,
 	isLoading,
 	isRedirecting,
 	sections,
@@ -68,18 +63,6 @@ const Module: FC<ModuleProps> = ({
 									{title}
 								</span>
 							</div>
-							{/* <Badge
-								variant={
-									pathwayStatus === 'NOT_STARTED' ? 'completed' : 'progress'
-								}
-								className='sm:ml-10 shrink-0'
-							>
-								{pathwayStatus === 'NOT_STARTED'
-									? 'Start'
-									: pathwayStatus === 'COMPLETED'
-									? 'Completed'
-									: 'In progress'}
-							</Badge> */}
 						</div>
 					</div>
 				</AccordionTrigger>
@@ -94,10 +77,8 @@ const Module: FC<ModuleProps> = ({
 							moduleId={id}
 							pathwayStatus={item.pathwayStatus}
 							generateContent={generateContent}
-							streamData={streamData}
-							progressFirst={progressFirst}
-							progressSecond={progressSecond}
-							progressThird={progressThird}
+							progress={progress}
+							contentPreview={contentPreview}
 							isLoading={isLoading}
 							isRedirecting={isRedirecting}
 							difficulty={difficulty}

@@ -60,18 +60,19 @@ export const POST = async (req: NextRequest) => {
 	const { message, difficulty } = SendMessageValidator.parse(body)
 
 	let validateMessageFromOpenAI = await openai.chat.completions.create({
-		model: 'gpt-4o',
+		model: 'gpt-5-nano',
 		messages: [
 			{
 				role: 'system',
 				content:
-					"You're a teaching assistant and your job is to tell me if you can generate an intuitive course outline and lecture notes for any input i give you. Answer eiter yes or no.",
+					"You're a teaching assistant. Answer only 'yes' or 'no' - can you generate an intuitive course outline and lecture notes for the given input?",
 			},
 			{
 				role: 'user',
 				content: `Can you generate a course for ${message}?`,
 			},
 		],
+		max_completion_tokens: 10, // Limit output for yes/no validation
 	})
 
 	if (
@@ -91,8 +92,8 @@ export const POST = async (req: NextRequest) => {
 	} 
   Divide the course into modules, and sections and ensure the structure covers all necessary concepts. Titles of Modules should not contain the module number. The title of the course outline should be the title of the course.`
 
-	const completion = await openai.beta.chat.completions.parse({
-		model: 'gpt-4o',
+	const completion = await openai.chat.completions.parse({
+		model: 'gpt-5-nano',
 		messages: [
 			{
 				role: 'user',
