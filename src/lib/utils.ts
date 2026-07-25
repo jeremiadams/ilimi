@@ -28,9 +28,6 @@ export function shuffleArray(array: any) {
 
 export function absoluteUrl(path: string) {
 	if (typeof window !== undefined) return path
-	if (process.env.RENDER_EXTERNAL_URL) {
-		return `${process.env.RENDER_EXTERNAL_URL}${path}`
-	}
 	if (process.env.VERCEL_URL) {
 		return `https://${process.env.VERCEL_URL}${path}`
 	}
